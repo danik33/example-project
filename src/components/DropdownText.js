@@ -38,6 +38,10 @@ function DropdownText(props) {
         setAnchor(event.currentTarget);
     }
 
+    function closeMenu() {
+        setAnchor(null);
+    }
+
 
       
     return (
@@ -53,18 +57,19 @@ function DropdownText(props) {
             </Button>
             <Menu
                 anchorEl={anchor}
+                onClose={closeMenu}
                 open={anchor != null}
             >
-                <MenuItem onClick={() => setAnchor(null)}>
+                <MenuItem onClick={closeMenu}>
                     hey
                 </MenuItem>
-                <MenuItem onClick={() => setAnchor(null)}>
+                <MenuItem onClick={closeMenu}>
                     hey
                 </MenuItem>
-                <MenuItem onClick={() => setAnchor(null)}>
+                <MenuItem onClick={closeMenu}>
                     hey
                 </MenuItem>
-                <MenuItem onClick={() => setAnchor(null)}>
+                <MenuItem onClick={closeMenu}>
                     hey
                 </MenuItem>
 
