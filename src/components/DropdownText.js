@@ -38,9 +38,22 @@ function DropdownText(props) {
         setAnchor(event.currentTarget);
     }
 
-    function closeMenu() {
+    function closeMenu(arg, a1) {
         setAnchor(null);
     }
+
+    
+    const menu = (
+        <Menu
+            anchorEl={anchor}
+            onClose={closeMenu}
+            open={anchor != null}
+        >
+            {props.menuContent}
+            
+
+        </Menu>
+    );
 
 
       
@@ -49,19 +62,14 @@ function DropdownText(props) {
             <Button
                 className={classes.btn}
                 variant="text"
-                onClick={handleClick}
+                onClick={props.customClick == null ? handleClick : null}
             >
-                {props.text}
-                <ArrowDropDownIcon />   
+                {props.children}
+                {props.nodropdown == null ? <ArrowDropDownIcon /> : null }
+                
             </Button>
-            <Menu
-                anchorEl={anchor}
-                onClose={closeMenu}
-                open={anchor != null}
-            >
-                {props.menuContent}
-
-            </Menu>
+            {props.nodropdown == null ? menu : null}
+            
             
             
         </div>

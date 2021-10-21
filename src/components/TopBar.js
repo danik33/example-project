@@ -1,6 +1,6 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Typography } from '@material-ui/core';
+import { Typography, Button } from '@material-ui/core';
 import DropdownText from './DropdownText';
 import Logo from '../res/logo.png';
 import { MenuItem, Menu } from '@mui/material';
@@ -70,16 +70,10 @@ function TopBar() {
         <div>
             <MenuItem >
                 Snake
-                </MenuItem>
-            <MenuItem >
-                Chess
-                </MenuItem>
-            <MenuItem >
-                Whatever
-                </MenuItem>
+            </MenuItem>
             <MenuItem>
-                heygg
-                </MenuItem>
+                Chess
+            </MenuItem>
         </div>
     );
 
@@ -91,8 +85,11 @@ function TopBar() {
             <div className={classes.holder}>
                 <img className={classes.logo} src={Logo} alt="Logo" />
                 <Typography variant="h4" className={classes.title} onClick={() => setTitle("fuckoff")} > {title} </Typography >
-                <DropdownText text="Gallery" menuContent={galleryMenu} />
-                <DropdownText text="Games" menuContent={gamesMenu} />
+                <DropdownText nodropdown="true"> About </DropdownText>
+                <DropdownText menuContent={galleryMenu} > Home </DropdownText>
+                <DropdownText menuContent={gamesMenu}   > Games </DropdownText>
+
+
             </div>
         </div>
     );
