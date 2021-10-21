@@ -50,28 +50,16 @@ function DropdownText(props) {
                 className={classes.btn}
                 variant="text"
                 onClick={handleClick}
-                >
+            >
                 {props.text}
-                <ArrowDropDownIcon />
-                
+                <ArrowDropDownIcon />   
             </Button>
             <Menu
                 anchorEl={anchor}
                 onClose={closeMenu}
                 open={anchor != null}
             >
-                <MenuItem onClick={closeMenu}>
-                    hey
-                </MenuItem>
-                <MenuItem onClick={closeMenu}>
-                    hey
-                </MenuItem>
-                <MenuItem onClick={closeMenu}>
-                    hey
-                </MenuItem>
-                <MenuItem onClick={closeMenu}>
-                    hey
-                </MenuItem>
+                {props.menuContent}
 
             </Menu>
             
