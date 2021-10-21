@@ -39,12 +39,9 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-function hey() {
-    
-}
+
 
 function TopBar() {
-
     const classes = useStyles();
 
     const [title, setTitle] = React.useState("Example Project");
