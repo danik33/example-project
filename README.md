@@ -6,8 +6,8 @@
 Needed software:
 - NodeJS
 
-1. Open Command Prompt in folder. \
-2. Run **npm install** and wait for for the installation. \
+1. Open Command Prompt in folder. 
+2. Run **npm install** and wait for for the installation.
 3. Run **npm start**.
 
 Runs the app in the development mode.\
