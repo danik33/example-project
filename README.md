@@ -4,7 +4,7 @@
 ## How to run:
 
 Needed software:
--NodeJS
+- NodeJS
 
 1.Open Command Prompt in folder. \
 2.Run **npm install** and wait for for the installation. \
