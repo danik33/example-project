@@ -126,6 +126,16 @@ function TopBar() {
                     <ArrowDropDownIcon/>
                 </Button>
 
+                <Button
+                    id="portf"
+                    className={classes.btn}
+                    variant="text"
+                    onClick={handleClick}
+                >
+                    Portoflio
+                </Button>
+                
+
                 
 
 
