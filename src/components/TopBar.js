@@ -11,6 +11,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 
 
+
 const useStyles = makeStyles((theme) => ({
 
     toolbar: {
@@ -18,9 +19,11 @@ const useStyles = makeStyles((theme) => ({
         height: '70px'
     },
     title: {
-        color: 'white',
+        color: '#f74843',
         WebkitTextStroke: '1px #f75c03',
-        marginRight: 100
+        marginRight: 100,
+        whiteSpace: 'nowrap'
+        
     },
     logo: {
         marginLeft: 10,

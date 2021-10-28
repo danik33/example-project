@@ -1,9 +1,10 @@
 
-import './App.css';
+import style from './App.css';
 import React, { useState } from 'react';
 
 
 import TopBar from "./components/TopBar";
+import LeftText from "./components/LeftText";
 
 import { makeStyles } from '@material-ui/core/styles';
 import { Button, TextField, Typography } from '@material-ui/core';
@@ -35,14 +36,12 @@ function App() {
 
 
     return (
-        <div className={classes.App}  >
+        <div className={classes.App} >
           <TopBar />
             <div className={classes.page}>
 
                 <div className={classes.content}>
-                    <Typography id="title" variant="h2">
-                        Look at this nerd
-                    </Typography>
+                    <LeftText />
                    
                 </div> 
             </div>
