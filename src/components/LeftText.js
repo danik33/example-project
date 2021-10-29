@@ -1,8 +1,9 @@
 import React from 'react';
 
-import './LeftText.css';
+import './LeftText.scss';
 import { makeStyles } from '@material-ui/core/styles';
 import { Typography, Button } from '@material-ui/core';
+import Link from 'react-router-dom/Link';
 
 
 
@@ -10,18 +11,21 @@ function LeftText() {
 
     return (
         <div class="holder">
-            <Typography variant="h2">
+            <Link exact to="/portfolio">
                 Portfolio
-            </Typography>
-            <Typography  variant="h2">
+            </Link>
+            <Link  exact to="/gallery/cats">
                 Cats
-            </Typography>
-            <Typography  variant="h2">
+            </Link>
+            <Link  exact to="/videos">
                 Videos
-            </Typography>
-            <Typography variant="h2">
+            </Link>
+            <Link exact to="/algorithms">
+                Algorithm showcase
+            </Link>
+            <Link exact to="/about">
                 About
-            </Typography>
+            </Link>
 
 
         </div> 

@@ -1,6 +1,12 @@
 
 import style from './App.css';
 import React, { useState } from 'react';
+import {
+    BrowserRouter as Router,
+    Switch,
+    Route,
+    Link
+  } from "react-router-dom";
 
 
 import TopBar from "./components/TopBar";
@@ -21,11 +27,7 @@ const useStyles = makeStyles((theme) => ({
     },
     image: {
         opacity: '60%'
-    },
-    content: {
-        position: 'static',
-        color: 'white'
-    },
+    }
 
 
    
@@ -36,16 +38,23 @@ function App() {
 
 
     return (
-        <div className={classes.App} >
-          <TopBar />
-            <div className={classes.page}>
+        <Router>
+            <div className={classes.App} >
+            <TopBar />
+                <div className={classes.page}>
 
-                <div className={classes.content}>
-                    <LeftText />
-                   
-                </div> 
+                    <Switch>
+                        <Route exact path="/">
+                            <LeftText />
+                        </Route>
+                        <Route path="/algorithms">
+
+                        </Route>
+                    </Switch>
+                    
+                </div>
             </div>
-        </div>
+        </Router>
   );
 }
 

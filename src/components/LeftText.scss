@@ -1,0 +1,36 @@
+
+
+
+.holder {
+    margin-left: 10vw;
+    margin-top: 17vh;
+    width: fit-content;
+    a  {
+        display: block;
+        font-weight: 800;
+        line-height: 1.4;
+        width: fit-content;
+        transition: 0.25s;
+        color: #f74843;
+        font-size: max(3.5vw, 3rem);
+        white-space: nowrap;
+        &:hover 
+        {
+            color: white;
+        }
+    }
+}
+
+a, a:visited, a:link, a:active {
+
+    text-decoration: none;
+    color: #f74843;
+}
+
+
+
+
+h2:hover {
+    color: white;
+    cursor: pointer;
+}

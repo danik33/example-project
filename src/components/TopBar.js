@@ -4,6 +4,7 @@ import { Typography, Button } from '@material-ui/core';
 import Logo from '../res/logo.png';
 import { MenuItem, Menu } from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import Link from 'react-router-dom/Link';
 
 
 
@@ -21,13 +22,16 @@ const useStyles = makeStyles((theme) => ({
     title: {
         color: '#f74843',
         WebkitTextStroke: '1px #f75c03',
-        marginRight: 100,
-        whiteSpace: 'nowrap'
+        
+        whiteSpace: 'nowrap',
+        display: 'inline',
+        position: 'relative',
+        top: -20
         
     },
     logo: {
         marginLeft: 10,
-        marginTop: -10,
+        marginTop: 10,
         width: 70,
         height: 70
     },
@@ -43,7 +47,15 @@ const useStyles = makeStyles((theme) => ({
         height: '100%',
         marginTop: '5px',
         margin: '5px 5px'
+    },
+    titleHolder: {
+        position: 'static',
+        marginTop: -20,
+        cursor: 'pointer',
+        height: '100%',
+        marginRight: 100
     }
+
 
 }));
 
@@ -64,6 +76,9 @@ function TopBar() {
             </MenuItem>
             <MenuItem>
                 Minesweeper
+            </MenuItem>
+            <MenuItem>
+                Chess
             </MenuItem>
         </div> 
         );
@@ -98,8 +113,12 @@ function TopBar() {
 
         <div className={classes.toolbar} >
             <div className={classes.holder}>
-                <img className={classes.logo} src={Logo} alt="Logo" />
-                <Typography variant="h4" className={classes.title} onClick={() => setTitle("fuckoff")} > {title} </Typography >
+                <div className={classes.titleHolder} >
+                    <Link to="/">
+                        <img className={classes.logo} src={Logo} alt="Logo" />
+                        <Typography variant="h4" className={classes.title}  > {title} </Typography >
+                    </Link>
+                </div> 
 
                 <Button
                     id="about"
