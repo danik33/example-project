@@ -14,6 +14,7 @@ import LeftText from "./components/LeftText";
 
 import { makeStyles } from '@material-ui/core/styles';
 import { Button, TextField, Typography } from '@material-ui/core';
+import Algorithms from './Pages/Algorithms';
 
 const theme = {"bluish" : "#5c73d7", "lightg" : "#61e786", "darkg" : "#049359", "gray" : "#454545", "orange" : "#f75c03"};
 
@@ -48,7 +49,7 @@ function App() {
                             <LeftText />
                         </Route>
                         <Route path="/algorithms">
-
+                            <Algorithms/>
                         </Route>
                     </Switch>
                     

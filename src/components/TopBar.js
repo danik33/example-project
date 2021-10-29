@@ -16,7 +16,7 @@ import Link from 'react-router-dom/Link';
 const useStyles = makeStyles((theme) => ({
 
     toolbar: {
-        background: 'linear-gradient(90deg, #049359 60%,  #61E786)',
+        background: 'linear-gradient(90deg, #5398BE 10%,  #61E786)',
         height: '70px'
     },
     title: {
@@ -53,7 +53,8 @@ const useStyles = makeStyles((theme) => ({
         marginTop: -20,
         cursor: 'pointer',
         height: '100%',
-        marginRight: 100
+        marginRight: 100,
+        whiteSpace: 'nowrap'
     }
 
 
