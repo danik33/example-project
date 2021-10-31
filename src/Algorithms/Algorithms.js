@@ -6,13 +6,20 @@ import ListItem from "./ListItem"
 
 function Algorithms()
 {
+
+    
     return (
         <div class="page"> 
-      
+            <div class="placeholder">
+
+            </div>
             <div class="list">
 
                 <ListItem>
                     A* Pathfinding
+                </ListItem>
+                <ListItem className="srt">
+                    Sorting visualisation
                 </ListItem>
             </div>
             <div class="content">

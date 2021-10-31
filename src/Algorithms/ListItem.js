@@ -10,23 +10,20 @@ import { ClassNames } from "@emotion/react";
 
 const useStyles = makeStyles({
     button: {
-        width: '100%',
-        height: '80px',
-        fontWeight: 800,
-        fontSize: 'max(2vw, 18px)'
+        
     }
   });
 
 
 function ListItem(props)
 {
-    const selected = {'backgroundColor' : 'green!important'}
+    const selectedStyle = {'backgroundColor' : 'rgba(0, 255, 0, 0.5)'}
     const classes = useStyles();
     return (
         <div class="wrapper"> 
-            <ButtonBase
-            className={classes.button}
-            sx={props.selected != null ? selected : null}
+            <ButtonBase 
+            className={"button " + props.className}
+            sx={props.selected != null ? selectedStyle : null}
              >
                 {props.children}
             </ButtonBase>
