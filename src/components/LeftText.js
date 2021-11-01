@@ -10,7 +10,7 @@ import Link from 'react-router-dom/Link';
 function LeftText() {
 
     return (
-        <div class="holder">
+        <div className="holder">
             <Link exact to="/portfolio">
                 Portfolio
             </Link>
