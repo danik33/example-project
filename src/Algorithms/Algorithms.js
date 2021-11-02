@@ -9,6 +9,8 @@ import {
   } from "react-router-dom";
 import ListItem from "./ListItem"
 
+import Minesweeper from "./Minesweeper"
+
 
 
 
@@ -27,6 +29,18 @@ class listItem {
     
 }
 
+function resize(){
+    const placeholder = document.getElementsByClassName("placeholder")[0];
+    if(window.innerWidth < 1145)
+    {
+        placeholder.style.width = "0px";
+    }
+    else
+    {
+        placeholder.style.width = "10%";
+    }
+    
+}
 function Algorithms()
 {
     let items = [];
@@ -48,18 +62,8 @@ function Algorithms()
 
 
     useEffect(()=>{
-        function resize(){
-            const placeholder = document.getElementsByClassName("placeholder")[0];
-            if(window.innerWidth < 1145)
-            {
-                placeholder.style.width = "0px";
-            }
-            else
-            {
-                placeholder.style.width = "10%";
-            }
-            
-        }
+        
+        resize();
         window.addEventListener('resize', resize);
     })
 
@@ -85,8 +89,14 @@ function Algorithms()
                     {itemList}
                 </div>
                 <div className="content">
-                    <Route>
-                    </Route>
+                    <Switch>
+                        <Route path="/algorithms/sorting">
+                            <div className="canvas">
+                                <Minesweeper/>
+                            </div>
+                        </Route>
+                    </Switch>
+                    
                 </div>
             </div>
         </Router>
