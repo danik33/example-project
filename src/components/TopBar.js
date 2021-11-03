@@ -66,7 +66,7 @@ const useStyles = makeStyles((theme) => ({
 function TopBar() {
     const classes = useStyles();
 
-    const [title, setTitle] = React.useState("Example Project");
+
     const [anchor, setAnchor] = React.useState(null);
     const [currentMenu, setMenu] = React.useState(null);
 
@@ -97,6 +97,8 @@ function TopBar() {
                 setMenu(gamesMenu);
                 setAnchor(event.currentTarget);
                 break;
+            default:
+
         }
     }
 
@@ -117,7 +119,7 @@ function TopBar() {
                 <div className={classes.titleHolder} >
                     <Link to="/">
                         <img className={classes.logo} src={Logo} alt="Logo" />
-                        <Typography variant="h4" className={classes.title}  > {title} </Typography >
+                        <Typography variant="h4" className={classes.title}  > Example Project </Typography >
                     </Link>
                 </div> 
 

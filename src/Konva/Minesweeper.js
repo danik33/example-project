@@ -1,39 +1,28 @@
-import { Button } from "@material-ui/core";
-import React, { useState, useEffect} from 'react';
-import './Algorithms.scss';
-import {
-    BrowserRouter as Router,
-    Switch,
-    Route,
-    Link
-  } from "react-router-dom";
-import ListItem from "./ListItem"
+
+import React, { useState} from 'react';
+import './KonvaStyles.scss';
+
 import { Layer, Line, Rect, Stage, Text } from "react-konva";
 
 
-function Minesweeper()
+function Minesweeper(props)
 {
     const [clicked, setClicked] = useState(false);
     const [mouseDown, mouseState] = useState(false);
 
-
-    function mouseHandle()
-    {
-        
-    }
     
     function handleClick(evt) 
     {
         console.log(evt);
-        if(evt.type == "mouseup")
+        if(evt.type === "mouseup")
         {
             mouseState(false)
             setClicked(false);
         }
-        if(evt.type == "mousedown")
+        if(evt.type === "mousedown")
         {
             mouseState(true)
-            if(evt.target._id == 4)
+            if(evt.target.attrs.id === "rect") 
             {
                 setClicked(true);
             }
@@ -47,32 +36,35 @@ function Minesweeper()
     return (
         <div className="konvacanvas">
             <Stage
-                width={640}
-                height={480}
+                width={props.width}
+                height={props.height}
                 onMouseDown={handleClick}
                 onMouseUp={handleClick}
                 >
                 <Layer >
-                    <Text text="trying text"/>
+                    <Text x={100} y={10}  text="trying text"/>
+                    <Rect
+                        id="rect"
+                        x={props.width/10}
+                        y={props.height/10}
+                        width={props.width/10}
+                        height={props.width/10}
+                        fill={clicked ? "red" : "black"}
+                        onMouseDown={() => {setClicked(true)}}
+                        onMouseUp={() => {setClicked(false)}}
+                        onMouseOver={() => (mouseDown) ? setClicked(true) : setClicked(false)}
+                        onMouseLeave={() => setClicked(false)}
+                        onClick={handleClick}
+                        draggable
+                        />
                     <Line
                         x={0}
                         y={0}
-                        points={[0, 0, 640, 480]}
+                        points={[0, 0, props.width, 0, props.width, props.height, 0, props.height, 0, 0]}
                         stroke="black"
-                        draggable
+                        strokeWidth={10}
                     />
-                    <Rect
-                        className="TEST"
-                        x={100}
-                        y={100}
-                        width={50}
-                        height={50}
-                        fill={clicked ? "red" : "black"}
-                        onMouseDown={handleClick}
-                        onMouseUp={handleClick}
-                        onMouseOver={() => (mouseDown) ? setClicked(true) : setClicked(false)}
-                        onMouseLeave={() => setClicked(false)}
-                        />
+                    
                 </Layer>
             </Stage>
         </div>
