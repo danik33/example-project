@@ -1,4 +1,5 @@
 # DarKLighT's Example project
+Dislcaimer: This is **not** a ready project and is in its very early development
 
 
 ## How to run:
