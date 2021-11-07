@@ -6,7 +6,7 @@ import { Layer, Rect, Stage } from 'react-konva';
 
 
 const DEFAULT_ARRAY_SIZE = 20;
-const DEFAULT_MIN = 0, DEFAULT_MAX = 1000;
+const DEFAULT_MIN = 30, DEFAULT_MAX = 1000;
 
 function rand(min, max)
 {
@@ -153,6 +153,7 @@ function Sorting(props)
     
     
     return (
+        
         <div className="konvacanvas">
             <Stage
                 width={props.width}
@@ -160,19 +161,14 @@ function Sorting(props)
             >
                 <Layer>
                     
-                    <Rect
-                    x={0}
-                    y={0}
-                    width={props.width}
-                    height={props.height}
-                    stroke="black" 
-                    />
+                    
                     <Rect
                         x={0}
-                        y={offSetTop}
-                        height={props.height-offSetTop-offSetBottom}
+                        y={0}
+                        height={props.height}
                         width={props.width}
-                        stroke="red"
+                        stroke="black"
+                        strokeWidth={3}
                         onClick={clickHandle}
                         />
                     {
@@ -182,7 +178,7 @@ function Sorting(props)
                                 ref={setRectRefs}
                                 key={e.key}
                                 
-                                x={((props.width+1-(arrSize-1) * interval)/arrSize)*index + interval*index}
+                                x={((props.width-3-(arrSize-1) * interval)/arrSize)*index + interval*index}
                                 y={calcY(e.value)}
                                 value={e.value}
                                 width={(props.width/(arrSize) - interval)}

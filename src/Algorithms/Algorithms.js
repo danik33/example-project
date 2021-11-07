@@ -29,7 +29,7 @@ class listItem {
 
 function resize(){
     const placeholder = document.getElementsByClassName("placeholder")[0];
-    if(window.innerWidth < 1145)
+    if(window.innerWidth < 1290)
     {
         placeholder.style.width = "0px";
     }
@@ -89,14 +89,14 @@ function Algorithms()
                 <div className="list">
                     {itemList}
                 </div>
-                <div className="content">
-                    <Switch>
-                        <Route path="/algorithms/sorting">
-                            <Sorting width={width}height={height}/>
-                        </Route>
-                    </Switch>
-                    
-                </div>
+                    <div className="content">
+                        <Switch>
+                            <Route path="/algorithms/sorting">
+                                <Sorting width={width}height={height}/>
+                            </Route>
+                        </Switch>
+                        
+                    </div>
             </div>
         </Router>
         
