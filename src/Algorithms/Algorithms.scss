@@ -2,7 +2,9 @@
 {
     background-color: white;
     height: 100%;
-    width: max(50%, 800px);
+    width: max(50%, 900px);
+    overflow-y: hidden;
+    position: absolute;
 }
 
 .list

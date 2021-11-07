@@ -29,13 +29,16 @@ class listItem {
 
 function resize(){
     const placeholder = document.getElementsByClassName("placeholder")[0];
+    const content = document.getElementsByClassName("content")[0]; 
     if(window.innerWidth < 1290)
     {
         placeholder.style.width = "0px";
+        content.style.left = "max(20%, 180px)";
     }
     else
     {
         placeholder.style.width = "10%";
+        content.style.left = "30%";
     }
     
 }
