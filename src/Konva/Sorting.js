@@ -1,7 +1,7 @@
 import { PinDropTwoTone } from '@material-ui/icons';
 import { Calculate } from '@mui/icons-material';
 import Konva from 'konva';
-import React, { useState} from 'react';
+import React, { useEffect, useState} from 'react';
 import { Layer, Rect, Stage } from 'react-konva';
 
 
@@ -28,6 +28,8 @@ function sleep(ms) {
   }
 
 
+var rectRefs = [];
+
 function Sorting(props)
 {
 
@@ -39,10 +41,11 @@ function Sorting(props)
     var offSetTop = 30, offSetBottom = 0;
     var interval = 1;
     var maxHeight = props.height-offSetBottom-offSetTop;
-    var rectRefs = [];
+    
 
     
     const [rectArray, setRectArray] = useState(initRectArray());
+    
 
     function initRectArray()
     {
@@ -50,8 +53,8 @@ function Sorting(props)
 
         let rectArr = arr.map((val, index) => ({
             key: index,
-            refID: index,
             value: val,
+            refID: index,
             fill: "black"
 
         }));
@@ -75,46 +78,58 @@ function Sorting(props)
     { 
         if(ref != null)
             rectRefs[ref.attrs.refID] = ref;
+        else
+            rectRefs = [];
     }
 
     function swapRects(index1, index2)
     {
-        let tempRectArr = [...rectArray];
-        let tempObj = {...tempRectArr[index1]};
-        tempRectArr[index1] = {...tempRectArr[index2]}
-        tempRectArr[index2] = tempObj;
-        setRectArray(tempRectArr);
+
+
+        let tempArray = [...rectArray];
+        let temp = tempArray[index1].value;
+        tempArray[index1].value = tempArray[index2].value;
+        tempArray[index2].value = temp;
+
+
+        setRectArray(tempArray);
+ 
 
     }
 
 
-    function swapRectsWithAnimation(index1, index2, duration)
+    async function swapRectsWithAnimation(index1, index2, duration)
     { 
         swapRects(index1, index2);
+
         let tempX1 = rectRefs[index1].attrs.x; 
         let tempX2 = rectRefs[index2].attrs.x;
+
+        
 
         rectRefs[index1].attrs.x = tempX2;
         rectRefs[index2].attrs.x = tempX1;
         let dur = (duration != null) ? duration : 0.2;
         rectRefs[index1].to({
             x: tempX1,
-            duration: dur
+            duration: dur,
+
             
         });
         rectRefs[index2].to({
             x: tempX2,
             duration: dur
         });
+        
     }
 
     async function clickHandle(e)
     {
-        for(let i = 0; i < arrSize-1; i++)
-        {
-            swapRectsWithAnimation(i, i+1, 0.1);
-            await sleep(200);
-        }
+        swapRectsWithAnimation(0, 1);
+        await sleep(2000);
+        swapRectsWithAnimation(0, 2);
+        await sleep(2000)
+        swapRectsWithAnimation(1, 2);
         
 
     }
@@ -163,9 +178,10 @@ function Sorting(props)
                     {
                         rectArray.map((e, index) => (
                             <Rect
-                                ref={setRectRefs}
-                                key={e.id}
                                 refID={e.refID}
+                                ref={setRectRefs}
+                                key={e.key}
+                                
                                 x={((props.width+1-(arrSize-1) * interval)/arrSize)*index + interval*index}
                                 y={calcY(e.value)}
                                 value={e.value}
