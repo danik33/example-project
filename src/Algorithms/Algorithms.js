@@ -69,7 +69,8 @@ function Algorithms()
         
         resize();
         window.addEventListener('resize', resize);
-    })
+        console.log(window.location.toString().endsWith("sorting"));
+    });
 
     let itemList = items.map((item) => 
         <ListItem

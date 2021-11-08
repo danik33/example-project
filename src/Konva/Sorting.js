@@ -1,27 +1,21 @@
 import { PinDropTwoTone } from '@material-ui/icons';
 import { Calculate } from '@mui/icons-material';
 import Konva from 'konva';
+import { Slider } from '@material-ui/core';
 import React, { useEffect, useState} from 'react';
 import { Layer, Rect, Stage } from 'react-konva';
+import { Button, Typography } from '@mui/material';
 
 
 const DEFAULT_ARRAY_SIZE = 20;
-const DEFAULT_MIN = 30, DEFAULT_MAX = 1000;
+const DEFAULT_MIN = 10, DEFAULT_MAX = 1000;
 
 function rand(min, max)
 {
     return parseInt(Math.random()*(max-min+1)+min);
 }
 
-function initArray()
-{
-    var temparray = [];
-    for(let i = 0; i < DEFAULT_ARRAY_SIZE; i++)
-    {
-        temparray[i] = {id: i, value: rand(DEFAULT_MIN, DEFAULT_MAX)};
-    }
-    return temparray;
-}
+
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -33,13 +27,12 @@ var rectRefs = [];
 function Sorting(props)
 {
 
-    const [entries, setEntries] = useState(DEFAULT_ARRAY_SIZE);
-    
-    var min = DEFAULT_MIN;
-    var max = DEFAULT_MAX; 
-    var arrSize = entries;
+    const [arrSize, setArrSize] = useState(DEFAULT_ARRAY_SIZE);
+    const [min, setMin] = useState(DEFAULT_MIN);
+    const [max, setMax] = useState(DEFAULT_MAX);
+    const [interval, setInterval] = useState(1);
+
     var offSetTop = 30, offSetBottom = 0;
-    var interval = 1;
     var maxHeight = props.height-offSetBottom-offSetTop;
     
 
@@ -98,7 +91,7 @@ function Sorting(props)
     }
 
 
-    async function swapRectsWithAnimation(index1, index2, duration)
+    function swapRectsWithAnimation(index1, index2, duration)
     { 
         swapRects(index1, index2);
 
@@ -125,24 +118,20 @@ function Sorting(props)
 
     async function clickHandle(e)
     {
-        swapRectsWithAnimation(0, 1);
-        await sleep(2000);
-        swapRectsWithAnimation(0, 2);
-        await sleep(2000)
-        swapRectsWithAnimation(1, 2);
-        
-
+        let dur = 0.2;
+        for(let i = 0; i < arrSize-1; i++)
+        {
+            swapRectsWithAnimation(i, i+1, dur);
+            await sleep(dur*1000 + 50 );
+        }
     }
 
- 
-
-    var rectClick = e => {
-        e.target.to({
-            x: 100,
-            y: 100,
-            duration: 2
-        });
+    function generateArrayBtn(e)
+    {
+        console.log("AAA");
     }
+
+
 
     
 
@@ -153,45 +142,91 @@ function Sorting(props)
     
     
     return (
-        
-        <div className="konvacanvas">
-            <Stage
-                width={props.width}
-                height={props.height}
-            >
-                <Layer>
-                    
-                    
-                    <Rect
-                        x={0}
-                        y={0}
-                        height={props.height}
-                        width={props.width}
-                        stroke="black"
-                        strokeWidth={3}
-                        onClick={clickHandle}
-                        />
-                    {
-                        rectArray.map((e, index) => (
-                            <Rect
-                                refID={e.refID}
-                                ref={setRectRefs}
-                                key={e.key}
-                                
-                                x={((props.width-3-(arrSize-1) * interval)/arrSize)*index + interval*index}
-                                y={calcY(e.value)}
-                                value={e.value}
-                                width={(props.width/(arrSize) - interval)}
-                                height={calculateHeight(e.value)}
-                                fill={e.fill}
-                            
-                            />
-
-                        ))
-                    }
+        <div className="container">
+            <div className="sliders">
+                <Typography>
+                    Array size:
+                </Typography>
+                <Slider
+                    defaultValue={20}
+                    valueLabelDisplay="auto"
+                    min={2}
+                    max={100}
+                />
+                <Typography>
+                    Minimum value:
+                </Typography>
+                <Slider
+                    defaultValue={0}
+                    valueLabelDisplay="auto"
+                    min={0}
+                    max={1000}
+                />
+                <Typography>
+                    Maximum value:
+                </Typography>
+                <Slider
+                    defaultValue={1000}
+                    valueLabelDisplay="auto"
+                    min={0}
+                    max={1000}
+                />
+                <Typography>
+                    Interval:
+                </Typography>
+                <Slider
+                    defaultValue={1}
+                    valueLabelDisplay="auto"
+                    min={0}
+                    max={5}
+                />
+                <Button
+                    variant="contained"
+                    onClick={generateArrayBtn}
+                >
+                    Generate array
+                </Button>
+            </div>
+            <div className="konvacanvas">
+            
+                <Stage
+                    width={props.width}
+                    height={props.height}
+                >
+                    <Layer>
                         
-                </Layer>
-            </Stage>
+                        
+                        <Rect
+                            x={0}
+                            y={0}
+                            height={props.height}
+                            width={props.width}
+                            stroke="black"
+                            strokeWidth={3}
+                            onClick={clickHandle}
+                            />
+                        {
+                            rectArray.map((e, index) => (
+                                <Rect
+                                    refID={e.refID}
+                                    ref={setRectRefs}
+                                    key={e.key}
+                                    
+                                    x={((props.width-3-(arrSize-1) * interval)/arrSize)*index + interval*index}
+                                    y={calcY(e.value)}
+                                    value={e.value}
+                                    width={(props.width/(arrSize) - interval)}
+                                    height={calculateHeight(e.value)}
+                                    fill={e.fill}
+                                
+                                />
+
+                            ))
+                        }
+                            
+                    </Layer>
+                </Stage>
+            </div>
         </div>
 
     );
