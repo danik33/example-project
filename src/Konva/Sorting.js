@@ -8,7 +8,7 @@ import { Button, Typography } from '@mui/material';
 import { blue } from '@mui/material/colors';
 
 const DEFAULT_ARRAY_SIZE = 20;
-const DEFAULT_MIN = 10, DEFAULT_MAX = 1000;
+const DEFAULT_MIN = 1, DEFAULT_MAX = 100;
 
 function rand(min, max)
 {
@@ -24,17 +24,18 @@ function sleep(ms) {
 
 var rectRefs = [];
 var shouldUpdate = false;
-var nextArrSize = null;
+
+
+var arrSize = DEFAULT_ARRAY_SIZE;
+var min = DEFAULT_MIN, max = DEFAULT_MAX;
+
 var nextMax = null, nextMin = null;
-
-
+var nextArrSize = null;
 
 function Sorting(props)
 {
 
-    const [arrSize, setArrSize] = useState(DEFAULT_ARRAY_SIZE);
-    const [min, setMin] = useState(DEFAULT_MIN);
-    const [max, setMax] = useState(DEFAULT_MAX);
+    
     const [interval, setInterval] = useState(1);
     const [animation, setAnimation] = useState(true);
     const [animationDuration, setAnimationDuration] = useState(0.2);
@@ -166,30 +167,24 @@ function Sorting(props)
     
     function generateArrayBtn(e)
     {
-        let flag = true;
-        console.log("Array btn: (" + nextMin + "-" + nextMax + ")");
-        if(nextArrSize != null)
+        if(nextMax != null)
         {
-            flag = false;
-            setArrSize(nextArrSize);
-            nextArrSize = null;
+            max = nextMax;
+            nextMax = null;
         }
         if(nextMin != null)
         {
-            flag = false;
-            setMin(nextMin);
+            min = nextMin;
             nextMin = null;
         }
-        if(nextMax != null)
+        if(nextArrSize != null)
         {
-            flag = false;
-            setMax(nextMax);
-            nextMax = null;
+            arrSize = nextArrSize;
+            nextArrSize = null;
         }
-        if(flag)
-            setRectArray(initRectArray());
-        else
-            shouldUpdate = true;
+
+        setRectArray(initRectArray());
+
     }
 
     useEffect(() => {  //Waiting on generateArrayButton states to take effect
@@ -221,14 +216,6 @@ function Sorting(props)
         nextMin = value[0];
         nextMax = value[1];
         setMinMax(value);
-        console.log("Slider: (" + nextMin + "-" + nextMax + ")");
-
-        
-    }
-
-    function maxValueSlider(e, value)
-    {
-        nextMax = value;
     }
 
     function intervalSlider(e, value)
@@ -270,26 +257,17 @@ function Sorting(props)
                     max={100}
                 />
                 <Typography>
-                    Minimum value:
+                    Range:
                 </Typography>
                 <Slider
                     defaultValue={0}
                     valueLabelDisplay="auto"
-                    min={0}
-                    max={1000}
+                    min={1}
+                    max={100}
                     value={minmax}
                     onChange={minValueSlider}
                 />
-                <Typography>
-                    Maximum value:
-                </Typography>
-                <Slider
-                    defaultValue={1000}
-                    valueLabelDisplay="auto"
-                    min={1}
-                    max={1000}
-                    onChange={maxValueSlider}
-                />
+               
                 <Button
                     variant="contained"
                     onClick={generateArrayBtn}
@@ -304,7 +282,7 @@ function Sorting(props)
                     defaultValue={1}
                     valueLabelDisplay="auto"
                     min={0}
-                    max={5}
+                    max={20}
                     onChange={intervalSlider}
                 />
 
@@ -384,7 +362,6 @@ function Sorting(props)
                                     y={calcY(e.value)}
                                     value={e.value}
                                     width={calcWidth()}
-                                    // width={(props.width/(arrSize) - interval)}
                                     height={calculateHeight(e.value)}
                                     fill={e.fill}
                                 
