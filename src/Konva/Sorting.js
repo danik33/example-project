@@ -3,7 +3,7 @@ import { Calculate } from '@mui/icons-material';
 import Konva from 'konva';
 import { Checkbox, FormControlLabel, FormGroup, Slider } from '@material-ui/core';
 import React, { useEffect, useState} from 'react';
-import { Layer, Rect, Stage } from 'react-konva';
+import { Layer, Line, Rect, Stage } from 'react-konva';
 import { Button, Typography } from '@mui/material';
 import { blue } from '@mui/material/colors';
 
@@ -65,7 +65,7 @@ function Sorting(props)
 
     function calcX(index)
     {
-        return ((props.width-3-(arrSize-1) * interval)/arrSize)*index + interval*index;
+        return ((props.width-interval-(arrSize-1) * interval)/arrSize)*index + interval*index;
     }
     
     function calculateHeight(val)
@@ -226,7 +226,7 @@ function Sorting(props)
                 <Slider
                     defaultValue={1000}
                     valueLabelDisplay="auto"
-                    min={0}
+                    min={1}
                     max={1000}
                     onChange={maxValueSlider}
                 />
@@ -297,14 +297,20 @@ function Sorting(props)
                 >
                     <Layer>
                         
-                        
+                        <Line
+                            
+                            x={0}
+                            y={0}
+                            stroke="black"
+                            strokeWidth={3}
+                            points={[props.width, 0, 0, 0, 0, props.height, props.width, props.height]}
+                            />
                         <Rect
                             x={0}
                             y={0}
                             height={props.height}
                             width={props.width}
-                            stroke="black"
-                            strokeWidth={3}
+
                             onClick={clickHandle}
                             />
                         {
