@@ -24,6 +24,11 @@ function sleep(ms) {
 
 var rectRefs = [];
 var shouldUpdate = false;
+var nextArrSize = null;
+var nextMax = null, nextMin = null;
+
+
+
 function Sorting(props)
 {
 
@@ -34,13 +39,13 @@ function Sorting(props)
     const [animation, setAnimation] = useState(true);
     const [animationDuration, setAnimationDuration] = useState(0.2);
     const [stepTime, setStepTime] = useState(0.1);
+    const [minmax, setMinMax] = useState([0, 1000]);
 
     var offSetTop = 30, offSetBottom = 0;
     var leftOffset = 3, rightOffset = 2;
     var maxHeight = props.height-offSetBottom-offSetTop;
 
-    var nextArrSize = null;
-    var nextMax = null, nextMin = null;
+    
     
 
     
@@ -161,28 +166,37 @@ function Sorting(props)
     
     function generateArrayBtn(e)
     {
-
+        let flag = true;
+        console.log("Array btn: (" + nextMin + "-" + nextMax + ")");
         if(nextArrSize != null)
         {
+            flag = false;
             setArrSize(nextArrSize);
             nextArrSize = null;
         }
         if(nextMin != null)
         {
+            flag = false;
             setMin(nextMin);
             nextMin = null;
         }
         if(nextMax != null)
         {
+            flag = false;
             setMax(nextMax);
             nextMax = null;
         }
-        shouldUpdate = true;
+        if(flag)
+            setRectArray(initRectArray());
+        else
+            shouldUpdate = true;
     }
 
     useEffect(() => {  //Waiting on generateArrayButton states to take effect
+        console.log("UseEffect");
         if(shouldUpdate)
         {
+            console.log("Should update");
             setRectArray(initRectArray());
             shouldUpdate = false;
         }
@@ -203,7 +217,13 @@ function Sorting(props)
 
     function minValueSlider(e, value)
     {
-        nextMin = value;
+        console.log("Slider: " + value);
+        nextMin = value[0];
+        nextMax = value[1];
+        setMinMax(value);
+        console.log("Slider: (" + nextMin + "-" + nextMax + ")");
+
+        
     }
 
     function maxValueSlider(e, value)
@@ -257,6 +277,7 @@ function Sorting(props)
                     valueLabelDisplay="auto"
                     min={0}
                     max={1000}
+                    value={minmax}
                     onChange={minValueSlider}
                 />
                 <Typography>
