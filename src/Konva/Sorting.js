@@ -3,7 +3,7 @@ import { Calculate } from '@mui/icons-material';
 import Konva from 'konva';
 import { Checkbox, FormControlLabel, FormGroup, Slider } from '@material-ui/core';
 import React, { useEffect, useState} from 'react';
-import { Layer, Line, Rect, Stage } from 'react-konva';
+import { Layer, Line, Rect, Stage, Text } from 'react-konva';
 import { Button, Typography } from '@mui/material';
 import { blue } from '@mui/material/colors';
 
@@ -31,6 +31,7 @@ var min = DEFAULT_MIN, max = DEFAULT_MAX;
 
 var nextMax = null, nextMin = null;
 var nextArrSize = null;
+var stop = false;
 
 function Sorting(props)
 {
@@ -148,7 +149,7 @@ function Sorting(props)
 
     async function clickHandle(e)
     {
-        for(let i = 0; i < arrSize-1; i++)
+        for(let i = 0; i < arrSize-1 && !stop; i++)
         {
             if(animation)
             {
@@ -161,12 +162,13 @@ function Sorting(props)
                 if(stepTime > 0)
                     await sleep(stepTime*1000);
             }
-            
         }
+        stop = false;
     }
     
     function generateArrayBtn(e)
     {
+        stop = true;
         if(nextMax != null)
         {
             max = nextMax;
@@ -353,6 +355,7 @@ function Sorting(props)
 
                             onClick={clickHandle}
                             />
+                        
                         {
                             rectArray.map((e, index) => (
                                 <Rect
@@ -371,6 +374,33 @@ function Sorting(props)
 
                             ))
                         }
+                        <Line
+                            x={0}
+                            y={0}
+                            stroke="black"
+                            strokeWidth={1}
+                            points={[0, offSetTop, 10, offSetTop]}
+                            />
+                        <Line
+                        x={0}
+                        y={0}
+                        stroke="black"
+                        strokeWidth={1}
+                        points={[0, (props.height-offSetTop)/2 + offSetTop , 10, (props.height-offSetTop)/2 + offSetTop]}
+                        />
+                        <Text
+                            text={"" + max}
+                            x={11}
+                            y={offSetTop-5}
+
+                            />
+                        <Text
+                        text={"" + max/2}
+                        x={11}
+                        y={(props.height)/2-5}
+
+
+                        />
                             
                     </Layer>
                 </Stage>
