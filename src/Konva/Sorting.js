@@ -23,7 +23,7 @@ function sleep(ms) {
 
 
 var rectRefs = [];
-
+var shouldUpdate = false;
 function Sorting(props)
 {
 
@@ -36,7 +36,11 @@ function Sorting(props)
     const [stepTime, setStepTime] = useState(0.1);
 
     var offSetTop = 30, offSetBottom = 0;
+    var leftOffset = 3, rightOffset = 2;
     var maxHeight = props.height-offSetBottom-offSetTop;
+
+    var nextArrSize = null;
+    var nextMax = null, nextMin = null;
     
 
     
@@ -65,8 +69,19 @@ function Sorting(props)
 
     function calcX(index)
     {
-        return ((props.width-interval-(arrSize-1) * interval)/arrSize)*index + interval*index;
+        if(index == arrSize-1)
+            console.log("X: " + (leftOffset+(calcWidth()*index + interval*index)));
+        return leftOffset+(calcWidth()*index + interval*index);
+        // return  leftOffset+((props.width-leftOffset-rightOffset)/arrSize + interval)*index
+        // return ((props.width-interval-(arrSize-1) * interval)/arrSize)*index + interval*index;
     }
+
+    function calcWidth()
+    {
+        return ((props.width-leftOffset-rightOffset)-interval*(arrSize-1))/arrSize;
+    }
+
+    
     
     function calculateHeight(val)
     {
@@ -143,11 +158,37 @@ function Sorting(props)
             
         }
     }
-
+    
     function generateArrayBtn(e)
     {
-        setRectArray(initRectArray());
+
+        if(nextArrSize != null)
+        {
+            setArrSize(nextArrSize);
+            nextArrSize = null;
+        }
+        if(nextMin != null)
+        {
+            setMin(nextMin);
+            nextMin = null;
+        }
+        if(nextMax != null)
+        {
+            setMax(nextMax);
+            nextMax = null;
+        }
+        shouldUpdate = true;
     }
+
+    useEffect(() => {  //Waiting on generateArrayButton states to take effect
+        if(shouldUpdate)
+        {
+            setRectArray(initRectArray());
+            shouldUpdate = false;
+        }
+        // setRectArray(initRectArray());
+
+    });
 
     function checkboxToggle(e)
     {
@@ -157,19 +198,17 @@ function Sorting(props)
 
     function arraySlider(e, value)
     {
-        setArrSize(value);
-        setRectArray(initRectArray());
+        nextArrSize = value;
     }
 
     function minValueSlider(e, value)
     {
-        setMin(value);
-        setRectArray(initRectArray());
+        nextMin = value;
     }
 
     function maxValueSlider(e, value)
     {
-        setMax(value);
+        nextMax = value;
     }
 
     function intervalSlider(e, value)
@@ -323,7 +362,8 @@ function Sorting(props)
                                     x={calcX(index)}
                                     y={calcY(e.value)}
                                     value={e.value}
-                                    width={(props.width/(arrSize) - interval)}
+                                    width={calcWidth()}
+                                    // width={(props.width/(arrSize) - interval)}
                                     height={calculateHeight(e.value)}
                                     fill={e.fill}
                                 
