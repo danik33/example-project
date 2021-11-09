@@ -286,7 +286,8 @@ function Sorting(props)
                     onChange={intervalSlider}
                 />
 
-                <FormGroup>
+                <FormGroup
+                    className="check">
                     <FormControlLabel 
                         control=
                         {
@@ -298,6 +299,7 @@ function Sorting(props)
                             /> 
                         }
                         label="Animation"
+                        
                         
                         />
                 </FormGroup>
