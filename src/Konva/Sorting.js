@@ -1,4 +1,4 @@
-import { PinDropTwoTone } from '@material-ui/icons';
+import { FunctionsOutlined, PinDropTwoTone } from '@material-ui/icons';
 import { Calculate } from '@mui/icons-material';
 import Konva from 'konva';
 import { Checkbox, FormControlLabel, FormGroup, Slider } from '@material-ui/core';
@@ -28,9 +28,13 @@ var shouldUpdate = false;
 
 var arrSize = DEFAULT_ARRAY_SIZE;
 var min = DEFAULT_MIN, max = DEFAULT_MAX;
+var scale = 1; //TODO 
+
 
 var nextMax = null, nextMin = null;
 var nextArrSize = null;
+var nextScale = null;  //TODO 
+var threads = 0;
 var stop = false;
 
 function Sorting(props)
@@ -42,6 +46,7 @@ function Sorting(props)
     const [animationDuration, setAnimationDuration] = useState(0.2);
     const [stepTime, setStepTime] = useState(0.1);
     const [minmax, setMinMax] = useState([0, 1000]);
+    const [sThread, setThreads] = useState(0);
 
     var offSetTop = 30, offSetBottom = 0;
     var leftOffset = 3, rightOffset = 2;
@@ -57,7 +62,8 @@ function Sorting(props)
     function initRectArray()
     {
         let arr = Array.from({length: arrSize}, () => rand(min, max));
-
+        // let arr = Array.from({length: arrSize}, (e, index) => 0.5*((Math.cos(index/10 - 3))*100)+50);
+        // console.log(arr);
         let rectArr = arr.map((val, index) => ({
             key: index,
             value: val,
@@ -76,11 +82,7 @@ function Sorting(props)
 
     function calcX(index)
     {
-        if(index == arrSize-1)
-            console.log("X: " + (leftOffset+(calcWidth()*index + interval*index)));
         return leftOffset+(calcWidth()*index + interval*index);
-        // return  leftOffset+((props.width-leftOffset-rightOffset)/arrSize + interval)*index
-        // return ((props.width-interval-(arrSize-1) * interval)/arrSize)*index + interval*index;
     }
 
     function calcWidth()
@@ -92,7 +94,7 @@ function Sorting(props)
     
     function calculateHeight(val)
     {
-        let pixelsPerobj = maxHeight/max;
+        let pixelsPerobj = maxHeight/(100*scale);
         
         return pixelsPerobj*val;
     }
@@ -121,7 +123,7 @@ function Sorting(props)
     }
 
 
-    function swapRectsWithAnimation(index1, index2, duration)
+    function swapRectsWithAnimation(index1, index2, duration, makered)
     { 
         swapRects(index1, index2);
 
@@ -134,6 +136,12 @@ function Sorting(props)
         rectRefs[index1].attrs.x = rectRefs[index2].attrs.x;
         rectRefs[index2].attrs.x = tempX;
         let dur = (duration != null) ? duration : animationDuration;
+
+        if(makered)
+        {
+            rectRefs[index1].attrs.fill = "red";
+            rectRefs[index2].attrs.fill = "red";
+        }
         rectRefs[index1].to({
             x: tempX1,
             duration: dur
@@ -142,31 +150,86 @@ function Sorting(props)
         });
         rectRefs[index2].to({
             x: tempX2,
-            duration: dur
+            duration: dur,
+            onFinish: () => {
+                rectRefs[index1].attrs.fill = "black";
+                rectRefs[index2].attrs.fill = "black";
+            }
         });
         
     }
 
     async function clickHandle(e)
     {
-        for(let i = 0; i < arrSize-1 && !stop; i++)
+        bubbleSort();
+
+    }
+
+    async function swap(index1, index2, wait)
+    {
+        if(animation)
+        {
+            swapRectsWithAnimation(index1, index2, animationDuration, true);
+        }
+        else 
+        {
+            swapRects(index1, index2);
+        }
+        if(wait && !stop)
         {
             if(animation)
             {
-                swapRectsWithAnimation(i, i+1, animationDuration);
-                await sleep(animationDuration*1000 + 50 );
+                await sleep(animationDuration*1000 + 50);
             }
             else
             {
-                swapRects(i, i+1);
-                if(stepTime > 0)
-                    await sleep(stepTime*1000);
+                await sleep(stepTime*1000);
             }
         }
-        stop = false;
+    }
+
+
+    async function bubbleSort()
+    {
+        setThreads(sThread+1);
+        threads++;
+        let swapped = true;
+        while(swapped && !stop)
+        {
+            swapped = false;
+            for(let i = 0; i < arrSize-1 && !stop; i++)
+            {
+                if(rectArray[i].value > rectArray[i+1].value)
+                {
+                    await swap(i, i+1, true);
+                    swapped = true;
+                }
+            }
+        }
+        threads--;
+        setThreads(sThread-1);
+        if(!stop)
+        {
+            if(threads == 0)
+            {
+                rectRefs.forEach(e => e.attrs.fill = "green");
+                await sleep(500);
+                rectRefs.forEach(e => e.attrs.fill = "black");
+            }
+            
+            
+
+        }
+        setThreads(sThread); //Kinda pointless, but helps to refresh colors 
+
+        
+        
+        if(threads == 0)
+            stop = false;
+        
     }
     
-    function generateArrayBtn(e)
+    async function generateArrayBtn(e)
     {
         stop = true;
         if(nextMax != null)
@@ -184,16 +247,16 @@ function Sorting(props)
             arrSize = nextArrSize;
             nextArrSize = null;
         }
-
         setRectArray(initRectArray());
+        
 
     }
 
     useEffect(() => {  //Waiting on generateArrayButton states to take effect
-        console.log("UseEffect");
+        // console.log("UseEffect");
         if(shouldUpdate)
         {
-            console.log("Should update");
+            // console.log("Should update");
             setRectArray(initRectArray());
             shouldUpdate = false;
         }
@@ -235,8 +298,7 @@ function Sorting(props)
         setStepTime(value);
     }
 
-
-
+    
     
 
     
@@ -293,7 +355,6 @@ function Sorting(props)
                     <FormControlLabel 
                         control=
                         {
-                            
                             <Checkbox
                                 defaultChecked  
                                 className="checkbox"
@@ -355,6 +416,12 @@ function Sorting(props)
 
                             onClick={clickHandle}
                             />
+
+                        <Text
+                            x={props.width/2}
+                            y={30}
+                            text={"Threads: " + threads}
+                            />
                         
                         {
                             rectArray.map((e, index) => (
@@ -380,30 +447,31 @@ function Sorting(props)
                             stroke="black"
                             strokeWidth={1}
                             points={[0, offSetTop, 10, offSetTop]}
-                            />
+                        />
                         <Line
-                        x={0}
-                        y={0}
-                        stroke="black"
-                        strokeWidth={1}
-                        points={[0, (props.height-offSetTop)/2 + offSetTop , 10, (props.height-offSetTop)/2 + offSetTop]}
+                            x={0}
+                            y={0}
+                            stroke="black"
+                            strokeWidth={1}
+                            points={[0, (props.height-offSetTop)/2 + offSetTop , 10, (props.height-offSetTop)/2 + offSetTop]}
                         />
                         <Text
-                            text={"" + max}
+                            text={"" + (100*scale)}
                             x={11}
                             y={offSetTop-5}
 
-                            />
+                        />
                         <Text
-                        text={"" + max/2}
-                        x={11}
-                        y={(props.height)/2-5}
-
-
+                            text={"" + (100*scale)/2}
+                            x={11}
+                            y={(props.height)/2-5}
                         />
                             
                     </Layer>
                 </Stage>
+            </div>
+            <div className="undercanvas">
+                
             </div>
         </div>
 
