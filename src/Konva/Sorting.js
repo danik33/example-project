@@ -1,11 +1,7 @@
-import { FunctionsOutlined, PinDropTwoTone } from '@material-ui/icons';
-import { Calculate } from '@mui/icons-material';
-import Konva from 'konva';
 import { Checkbox, FormControlLabel, FormGroup, Slider } from '@material-ui/core';
 import React, { useEffect, useState} from 'react';
 import { Layer, Line, Rect, Stage, Text } from 'react-konva';
 import { Button, Typography } from '@mui/material';
-import { blue } from '@mui/material/colors';
 
 const DEFAULT_ARRAY_SIZE = 20;
 const DEFAULT_MIN = 1, DEFAULT_MAX = 100;
@@ -23,7 +19,7 @@ function sleep(ms) {
 
 
 var rectRefs = [];
-var shouldUpdate = false;
+var shouldCreate = false;
 
 
 var arrSize = DEFAULT_ARRAY_SIZE;
@@ -85,9 +81,13 @@ function Sorting(props)
         return leftOffset+(calcWidth()*index + interval*index);
     }
 
-    function calcWidth()
+    function calcWidth(inter, arrsize)
     {
-        return ((props.width-leftOffset-rightOffset)-interval*(arrSize-1))/arrSize;
+        let interv = (inter == null) ? interval : inter;
+        let arrS = (arrsize == null) ? arrSize : arrSize;
+        return ((props.width-leftOffset-rightOffset)-interv*(arrSize-1))/arrSize;
+        
+
     }
 
     
@@ -183,7 +183,8 @@ function Sorting(props)
             }
             else
             {
-                await sleep(stepTime*1000);
+                if(stepTime > 0)
+                    await sleep(stepTime*1000);
             }
         }
     }
@@ -208,23 +209,25 @@ function Sorting(props)
         }
         threads--;
         setThreads(sThread-1);
-        if(!stop)
+        if(!stop && threads === 0)
         {
-            if(threads == 0)
-            {
-                rectRefs.forEach(e => e.attrs.fill = "green");
-                await sleep(500);
-                rectRefs.forEach(e => e.attrs.fill = "black");
-            }
-            
-            
 
+            rectRefs.forEach(e => e.attrs.fill = "green");
+            await sleep(500);
+            rectRefs.forEach(e => e.attrs.fill = "black");
+  
         }
+        else if(shouldCreate && threads === 0)
+        {
+            setRectArray(initRectArray());
+            stop = false;
+        }
+    
         setThreads(sThread); //Kinda pointless, but helps to refresh colors 
-
         
         
-        if(threads == 0)
+        
+        if(threads === 0)
             stop = false;
         
     }
@@ -247,19 +250,22 @@ function Sorting(props)
             arrSize = nextArrSize;
             nextArrSize = null;
         }
-        setRectArray(initRectArray());
+        if(threads > 0)
+            shouldCreate = true;
+        else 
+            setRectArray(initRectArray());
         
 
     }
 
     useEffect(() => {  //Waiting on generateArrayButton states to take effect
         // console.log("UseEffect");
-        if(shouldUpdate)
-        {
-            // console.log("Should update");
-            setRectArray(initRectArray());
-            shouldUpdate = false;
-        }
+        // if(shouldUpdate)
+        // {
+        //     // console.log("Should update");
+        //     setRectArray(initRectArray());
+        //     shouldUpdate = false;
+        // }
         // setRectArray(initRectArray());
 
     });
@@ -285,7 +291,8 @@ function Sorting(props)
 
     function intervalSlider(e, value)
     {
-        setInterval(value);
+        if(calcWidth(value) >= 1)
+            setInterval(value);
     }
 
     function animationTimeSlider(e, value)
@@ -318,7 +325,7 @@ function Sorting(props)
                     valueLabelDisplay="auto"
                     onChange={arraySlider}
                     min={2}
-                    max={100}
+                    max={1000}
                 />
                 <Typography>
                     Range:
@@ -347,6 +354,7 @@ function Sorting(props)
                     valueLabelDisplay="auto"
                     min={0}
                     max={20}
+                    value={interval}
                     onChange={intervalSlider}
                 />
 
@@ -471,7 +479,7 @@ function Sorting(props)
                 </Stage>
             </div>
             <div className="undercanvas">
-                
+
             </div>
         </div>
 
