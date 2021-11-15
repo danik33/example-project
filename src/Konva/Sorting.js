@@ -2,6 +2,10 @@ import { Checkbox, FormControlLabel, FormGroup, Slider } from '@material-ui/core
 import React, { useEffect, useState} from 'react';
 import { Layer, Line, Rect, Stage, Text } from 'react-konva';
 import { Button, Typography } from '@mui/material';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
 
 const DEFAULT_ARRAY_SIZE = 20;
 const DEFAULT_MIN = 1, DEFAULT_MAX = 100;
@@ -26,9 +30,9 @@ var arrSize = DEFAULT_ARRAY_SIZE;
 var min = DEFAULT_MIN, max = DEFAULT_MAX;
 var scale = 1; //TODO 
 
+var changedArrSize = false; 
 
 var nextMax = null, nextMin = null;
-var nextArrSize = null;
 var nextScale = null;  //TODO 
 var threads = 0;
 var stop = false;
@@ -43,6 +47,8 @@ function Sorting(props)
     const [stepTime, setStepTime] = useState(0.1);
     const [minmax, setMinMax] = useState([0, 1000]);
     const [sThread, setThreads] = useState(0);
+    const [nextArrSize, setNextArrSize] = useState(null);
+    const [algorithm, setAlgorithm] = useState("Bubble sort");
 
     var offSetTop = 30, offSetBottom = 0;
     var leftOffset = 3, rightOffset = 2;
@@ -84,8 +90,8 @@ function Sorting(props)
     function calcWidth(inter, arrsize)
     {
         let interv = (inter == null) ? interval : inter;
-        let arrS = (arrsize == null) ? arrSize : arrSize;
-        return ((props.width-leftOffset-rightOffset)-interv*(arrSize-1))/arrSize;
+        let arrS = (arrsize == null) ? arrSize : arrsize;
+        return ((props.width-leftOffset-rightOffset)-interv*(arrS-1))/arrS;
         
 
     }
@@ -159,7 +165,7 @@ function Sorting(props)
         
     }
 
-    async function clickHandle(e)
+    async function sortHandle(e)
     {
         bubbleSort();
 
@@ -245,10 +251,9 @@ function Sorting(props)
             min = nextMin;
             nextMin = null;
         }
-        if(nextArrSize != null)
+        if(changedArrSize)
         {
             arrSize = nextArrSize;
-            nextArrSize = null;
         }
         if(threads > 0)
             shouldCreate = true;
@@ -278,7 +283,12 @@ function Sorting(props)
 
     function arraySlider(e, value)
     {
-        nextArrSize = value;
+        console.log(value);
+        console.log("Width: " + calcWidth(null, value));
+        if(calcWidth(null, value) >= 1)
+            setNextArrSize(value);
+        changedArrSize = true;
+        // nextArrSize = value;
     }
 
     function minValueSlider(e, value)
@@ -305,6 +315,13 @@ function Sorting(props)
         setStepTime(value);
     }
 
+    function selectionChange(e)
+    {
+        console.log(e.target.value);
+        console.log(algorithm);
+        setAlgorithm(e.target.value);
+    }
+
     
     
 
@@ -324,6 +341,7 @@ function Sorting(props)
                     defaultValue={20}
                     valueLabelDisplay="auto"
                     onChange={arraySlider}
+                    value={nextArrSize}
                     min={2}
                     max={1000}
                 />
@@ -422,7 +440,6 @@ function Sorting(props)
                             height={props.height}
                             width={props.width}
 
-                            onClick={clickHandle}
                             />
 
                         <Text
@@ -478,8 +495,28 @@ function Sorting(props)
                     </Layer>
                 </Stage>
             </div>
+            
             <div className="undercanvas">
+                <FormControl variant="standard" className="select">
+                    <InputLabel id="algorithm"> Algorithm </InputLabel>
+                    <Select
 
+                        value={algorithm}
+                        onChange={selectionChange}
+                    >
+                        <MenuItem value="Bubble sort"> Bubble sort </MenuItem>
+                        <MenuItem value= "Selection sort"> Selection sort</MenuItem>
+                    </Select>
+
+                </FormControl>
+                    
+                <Button 
+                variant="contained"
+                className="sortBtn"
+                onClick={sortHandle}
+                >
+                    Sort
+                </Button>
             </div>
         </div>
 
