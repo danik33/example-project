@@ -1,12 +1,4 @@
-.content
-{
-    background-color: #ffffff;
-    height: 100%;
-    width: max(50%, 900px);
-    overflow-y: hidden;
-    position: absolute;
 
-}
 
 .list
 {
@@ -91,8 +83,29 @@
 .placeholder
 {
     height: 100%;
+    width: 10%;
+}
+
+.content
+{
+    background-color: #ffffff;
+    height: 100%;
+    width: max(50%, 900px);
+    overflow-y: hidden;
+    position: absolute;
+    left: 30%;
 
 }
+
+@media only screen and (max-width: 1290px) {
+    .placeholder {
+        width: 0px;
+    }
+    .content
+    {
+        left: max(20%, 180px);
+    }
+  }
 
 .sortBtn
 {
