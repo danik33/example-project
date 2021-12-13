@@ -6,13 +6,12 @@ import "./Algorithms.scss"
 import ButtonBase from '@mui/material/ButtonBase';
 import { Link } from "react-router-dom";
 
+const selectedStyle = {'backgroundColor' : 'rgba(0, 255, 0, 0.5)'}
 
+const ListItem = React.forwardRef((props, ref) => {
 
-function ListItem(props)
-{
-    const selectedStyle = {'backgroundColor' : 'rgba(0, 255, 0, 0.5)'}
     return (
-        <div className="wrapper"> 
+        <div className="wrapper" > 
             <ButtonBase 
  
             component={Link}
@@ -21,6 +20,8 @@ function ListItem(props)
             sx={props.selected != null ? selectedStyle : null}
             onClick={props.onClick}
             id={props.id}
+            ref={ref}
+            index={props.index}
              >
                 {props.children}
             </ButtonBase>
@@ -29,6 +30,8 @@ function ListItem(props)
         
 
     );
-}
+
+});
+
 
 export default ListItem;

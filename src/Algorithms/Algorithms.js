@@ -14,7 +14,6 @@ import Sorting from '../Konva/Sorting';
 
 
 
-var previousTarget;
 
 class listItem {
     constructor(text, id, customClassName)
@@ -49,19 +48,34 @@ function Algorithms()
     items.push(new listItem("Sorting visualisation", "sorting", "srt"));
     items.push(new listItem("Travelling Salesperson", "sales", "trv"));
 
-  
+    
     const [width, setWidth] = useState(640);
     const [height, setHeight] = useState(480);
 
+    var refList = [];
 
+    function setRefs(arg)
+    {
+        if(arg != null)
+        {
+            let index = parseInt(arg.attributes.index.value);
+            refList[index] = arg;
+        }
+    }
+
+
+    function selectTab(index)
+    {
+        for(let i = 0; i < refList.length; i++)
+        {
+            refList[i].style.backgroundColor = "transparent";
+        }
+        refList[index].style.backgroundColor = "white";
+    }
 
     function itemClick(arg){
-        if(previousTarget != null)
-        {
-            previousTarget.style.backgroundColor = "transparent";
-        }
-        previousTarget = arg.currentTarget;
-        arg.currentTarget.style.backgroundColor = "white";
+        let index = parseInt(arg.currentTarget.attributes.index.value);
+        selectTab(index);
     }
 
 
@@ -69,15 +83,23 @@ function Algorithms()
         
         resize();
         window.addEventListener('resize', resize);
-        console.log(window.location.toString().endsWith("sorting"));
+        for(let i = 0; i < items.length; i++)
+        {
+            if(window.location.toString().endsWith(items[i].id))
+            {
+                selectTab(i);
+            }
+        }
     });
 
-    let itemList = items.map((item) => 
+    let itemList = items.map((item, index) => 
         <ListItem
             key = {item.id}
             id = {item.id}
+            index = {index}
             className = {item.className}
             onClick={itemClick}
+            ref = {setRefs}
         >
             {item.text}
         </ListItem>

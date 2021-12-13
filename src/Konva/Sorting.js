@@ -1,5 +1,5 @@
 import { Checkbox, FormControlLabel, FormGroup, Slider } from '@material-ui/core';
-import React, { useEffect, useState} from 'react';
+import React, { useEffect, useState, useRef} from 'react';
 import { Layer, Line, Rect, Stage, Text } from 'react-konva';
 import { Button, Typography } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
@@ -23,7 +23,7 @@ function sleep(ms) {
 
 
 var rectRefs = [];
-var shouldCreate = false;
+var shouldCreate = false, readyToCreate = false;
 
 
 var arrSize = DEFAULT_ARRAY_SIZE;
@@ -40,14 +40,13 @@ var stop = false;
 function Sorting(props)
 {
 
-    
     const [interval, setInterval] = useState(1);
     const [animation, setAnimation] = useState(true);
     const [animationDuration, setAnimationDuration] = useState(0.2);
     const [stepTime, setStepTime] = useState(0.1);
     const [minmax, setMinMax] = useState([0, 1000]);
     const [sThread, setThreads] = useState(0);
-    const [nextArrSize, setNextArrSize] = useState(null);
+    const [nextArrSize, setNextArrSize] = useState(arrSize);
     const [algorithm, setAlgorithm] = useState("Bubble sort");
 
     var offSetTop = 30, offSetBottom = 0;
@@ -225,8 +224,8 @@ function Sorting(props)
         }
         else if(shouldCreate && threads === 0)
         {
-            setRectArray(initRectArray());
-            stop = false;
+            readyToCreate = true;
+            
         }
     
         setThreads(sThread); //Kinda pointless, but helps to refresh colors 
@@ -235,6 +234,13 @@ function Sorting(props)
         
         if(threads === 0)
             stop = false;
+        
+    }
+
+    function generateArray()
+    {
+        setRectArray(initRectArray());
+        
         
     }
     
@@ -258,21 +264,23 @@ function Sorting(props)
         if(threads > 0)
             shouldCreate = true;
         else 
-            setRectArray(initRectArray());
+            generateArray();
         
 
     }
 
-    useEffect(() => {  //Waiting on generateArrayButton states to take effect
-        // console.log("UseEffect");
-        // if(shouldUpdate)
-        // {
-        //     // console.log("Should update");
-        //     setRectArray(initRectArray());
-        //     shouldUpdate = false;
-        // }
-        // setRectArray(initRectArray());
-
+    useEffect(() => 
+    { 
+        if(readyToCreate)
+        {
+            shouldCreate = false;
+            readyToCreate = false;
+            generateArray();
+            for(let i = 0; i < rectRefs.length; i++) //Easy fix for rects getting out of position after unexpected generate press while sorting is ongoing
+            {
+                rectRefs[i].attrs.x = calcX(i);
+            }
+        }
     });
 
     function checkboxToggle(e)
@@ -293,7 +301,6 @@ function Sorting(props)
 
     function minValueSlider(e, value)
     {
-        console.log("Slider: " + value);
         nextMin = value[0];
         nextMax = value[1];
         setMinMax(value);
@@ -343,7 +350,7 @@ function Sorting(props)
                     onChange={arraySlider}
                     value={nextArrSize}
                     min={2}
-                    max={1000}
+                    max={200}
                 />
                 <Typography>
                     Range:
