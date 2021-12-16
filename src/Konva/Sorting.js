@@ -48,6 +48,8 @@ function Sorting(props)
     const [sThread, setThreads] = useState(0);
     const [nextArrSize, setNextArrSize] = useState(arrSize);
     const [algorithm, setAlgorithm] = useState("Bubble sort");
+    const [rectRefs2, setRectRef2] = useState(null);
+    const [shouldUpdate, setUpdate] = useState(false);
 
     var offSetTop = 30, offSetBottom = 0;
     var leftOffset = 3, rightOffset = 2;
@@ -104,12 +106,24 @@ function Sorting(props)
         return pixelsPerobj*val;
     }
 
+    function updateRefs()
+    {
+        console.log("Updated refs");
+        setRectRef2(rectRefs);
+        console.log(rectRefs2);
+    }
+    
     function setRectRefs(ref)
     { 
         if(ref != null)
+        {
             rectRefs[ref.attrs.refID] = ref;
+            
+        }
         else
             rectRefs = [];
+        
+       
     }
 
     function swapRects(index1, index2)
@@ -168,8 +182,9 @@ function Sorting(props)
 
         if(makered)
         {
-            rectRefs[index1].attrs.fill = "red";
-            rectRefs[index2].attrs.fill = "red";
+            fill(index1, "red");
+            fill(index2, "red"); 
+
         }
         rectRefs[index1].to({
             x: tempX1,
@@ -181,8 +196,8 @@ function Sorting(props)
             x: tempX2,
             duration: dur,
             onFinish: () => {
-                rectRefs[index1].attrs.fill = "black";
-                rectRefs[index2].attrs.fill = "black";
+                fill(index1, "black");
+                fill(index2, "black"); 
             }
         });
         
@@ -190,43 +205,21 @@ function Sorting(props)
 
     async function sortHandle(e)
     {
+        setThreads(sThread+1);
+        threads++;
+
+
         switch(algorithm)
         {
             case "Bubble sort":
-                bubbleSort();
+                await bubbleSort();
                 break;
             case "Selection sort":
-                console.log("Selection");
+                await selectionSort();
                 break;
         }
 
-    }
 
-    
-
-    async function selectionSort()
-    {
-
-    }
-
-
-    async function bubbleSort()
-    {
-        setThreads(sThread+1);
-        threads++;
-        let swapped = true;
-        while(swapped && !stop)
-        {
-            swapped = false;
-            for(let i = 0; i < arrSize-1 && !stop; i++)
-            {
-                if(rectArray[i].value > rectArray[i+1].value)
-                {
-                    await swap(i, i+1, true);
-                    swapped = true;
-                }
-            }
-        }
         threads--;
         setThreads(sThread-1);
         if(!stop && threads === 0)
@@ -249,6 +242,92 @@ function Sorting(props)
         
         if(threads === 0)
             stop = false;
+
+    }
+
+    function fill(index, color, dur)
+    {
+        let dr = 0;
+        if(dur != null)
+            dr = dur;
+        rectRefs[index].to({
+            fill: color,
+            duration: dr
+        });
+    }
+
+    
+
+    async function selectionSort()
+    {
+        
+
+        for(let i = 0; i < rectArray.length && !stop; i++)
+        {
+            let minIndex = i;
+            for(let j = i; j < rectArray.length && !stop;  j++)
+            {
+                if(animation)
+                {
+                    for(let x = 0; x < rectArray.length && !stop; x++)
+                    {
+                        if(x < i)
+                            fill(x, "green");
+                        else
+                            fill(x, "black");
+                    }
+                    fill(i, "red");
+                    fill(minIndex, "green");
+                    fill(j, "yellow");
+                    await sleep(animationDuration*500);
+                }
+
+                if(rectArray[j].value < rectArray[minIndex].value)
+                    minIndex = j;
+            }
+            if(i != minIndex)
+                await swap(i, minIndex, true);
+            
+        }
+
+    }
+
+
+    async function bubbleSort()
+    {
+        
+        let swapped = true;
+        while(swapped && !stop)
+        {
+            swapped = false;
+            for(let i = 0; i < arrSize-1 && !stop; i++)
+            {
+                if(animation)
+                {
+                    
+                    for(let x = 0; x < rectArray.length && !stop; x++)
+                    {
+                        if(!swapped && x < i)
+                            fill(x, "green");
+                        else
+                            fill(x, "black");
+                    }
+                    fill(i, "yellow");
+                    if(rectArray[i].value > rectArray[i+1].value)
+                        fill(i+1, "red");
+                    else
+                        fill(i+1, "green");
+
+                    await sleep(animationDuration*500);
+                }
+                if(rectArray[i].value > rectArray[i+1].value)
+                {
+                    await swap(i, i+1, true);
+                    swapped = true;
+                }
+            }
+        }
+        
         
     }
 
@@ -291,9 +370,11 @@ function Sorting(props)
             shouldCreate = false;
             readyToCreate = false;
             generateArray();
+            
             for(let i = 0; i < rectRefs.length; i++) //Easy fix for rects getting out of position after unexpected generate press while sorting is ongoing
             {
                 rectRefs[i].attrs.x = calcX(i);
+                fill(i, "black");
             }
         }
     });
@@ -447,7 +528,6 @@ function Sorting(props)
                     height={props.height}
                 >
                     <Layer>
-                        
                         <Line
                             
                             x={0}
@@ -483,6 +563,7 @@ function Sorting(props)
                                     width={calcWidth()}
                                     height={calculateHeight(e.value)}
                                     fill={e.fill}
+                                    shouldUpdate={shouldUpdate}
                                 
                                 />
 
