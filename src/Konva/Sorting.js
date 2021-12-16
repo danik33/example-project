@@ -1,7 +1,7 @@
 import { Checkbox, FormControlLabel, FormGroup, Slider } from '@material-ui/core';
 import React, { useEffect, useState, useRef} from 'react';
 import { Layer, Line, Rect, Stage, Text } from 'react-konva';
-import { Button, Typography } from '@mui/material';
+import { breadcrumbsClasses, Button, Typography } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -127,6 +127,30 @@ function Sorting(props)
 
     }
 
+    async function swap(index1, index2, wait)
+    {
+        if(animation)
+        {
+            swapRectsWithAnimation(index1, index2, animationDuration, true);
+        }
+        else 
+        {
+            swapRects(index1, index2);
+        }
+        if(wait && !stop)
+        {
+            if(animation)
+            {
+                await sleep(animationDuration*1000 + 50);
+            }
+            else
+            {
+                if(stepTime > 0)
+                    await sleep(stepTime*1000);
+            }
+        }
+    }
+
 
     function swapRectsWithAnimation(index1, index2, duration, makered)
     { 
@@ -166,32 +190,23 @@ function Sorting(props)
 
     async function sortHandle(e)
     {
-        bubbleSort();
+        switch(algorithm)
+        {
+            case "Bubble sort":
+                bubbleSort();
+                break;
+            case "Selection sort":
+                console.log("Selection");
+                break;
+        }
 
     }
 
-    async function swap(index1, index2, wait)
+    
+
+    async function selectionSort()
     {
-        if(animation)
-        {
-            swapRectsWithAnimation(index1, index2, animationDuration, true);
-        }
-        else 
-        {
-            swapRects(index1, index2);
-        }
-        if(wait && !stop)
-        {
-            if(animation)
-            {
-                await sleep(animationDuration*1000 + 50);
-            }
-            else
-            {
-                if(stepTime > 0)
-                    await sleep(stepTime*1000);
-            }
-        }
+
     }
 
 
@@ -507,7 +522,6 @@ function Sorting(props)
                 <FormControl variant="standard" className="select">
                     <InputLabel id="algorithm"> Algorithm </InputLabel>
                     <Select
-
                         value={algorithm}
                         onChange={selectionChange}
                     >

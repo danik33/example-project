@@ -12,6 +12,7 @@ import LeftText from "./components/LeftText";
 
 import { makeStyles } from '@material-ui/core/styles';
 import Algorithms from './Algorithms/Algorithms';
+import Link from 'react-router-dom/Link';
 
 
 
@@ -20,7 +21,8 @@ const useStyles = makeStyles((theme) => ({
         position: 'fixed',
         width: '100%',
         height: '100%',
-        backgroundImage: "url(/img.jpg)"
+        background: "url(/img.jpg) no-repeat center center fixed",
+        backgroundSize: "cover"
     },
     image: {
         opacity: '60%'
@@ -42,7 +44,23 @@ function App() {
 
                     <Switch>
                         <Route exact path="/">
-                            <LeftText />
+                            <LeftText>
+                                <Link exact to="/portfolio">
+                                    Portfolio
+                                </Link>
+                                <Link  exact to="/gallery/cats">
+                                    Cats
+                                </Link>
+                                <Link  exact to="/videos">
+                                    Videos
+                                </Link>
+                                <Link exact to="/algorithms">
+                                    Algorithm showcase
+                                </Link>
+                                <Link exact to="/about">
+                                    About
+                                </Link>
+                            </LeftText>
                         </Route>
                         <Route path="/algorithms">
                             <Algorithms/>
