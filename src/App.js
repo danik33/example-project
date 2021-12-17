@@ -13,6 +13,7 @@ import LeftText from "./components/LeftText";
 import { makeStyles } from '@material-ui/core/styles';
 import Algorithms from './Algorithms/Algorithms';
 import Link from 'react-router-dom/Link';
+import "./AppStyles.scss"
 
 
 
@@ -26,7 +27,8 @@ const useStyles = makeStyles((theme) => ({
     },
     image: {
         opacity: '60%'
-    }
+    },
+    
 
 
    
@@ -44,7 +46,7 @@ function App() {
 
                     <Switch>
                         <Route exact path="/">
-                            <LeftText>
+                            <LeftText className="leftTitles">
                                 <Link exact to="/portfolio">
                                     Portfolio
                                 </Link>

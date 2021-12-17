@@ -1,11 +1,12 @@
 import { Checkbox, FormControlLabel, FormGroup, Slider } from '@material-ui/core';
 import React, { useEffect, useState, useRef} from 'react';
 import { Layer, Line, Rect, Stage, Text } from 'react-konva';
-import { breadcrumbsClasses, Button, Typography } from '@mui/material';
+import { Button, Typography } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import { Link } from 'react-router-dom';
 
 const DEFAULT_ARRAY_SIZE = 20;
 const DEFAULT_MIN = 1, DEFAULT_MAX = 100;
@@ -48,8 +49,8 @@ function Sorting(props)
     const [sThread, setThreads] = useState(0);
     const [nextArrSize, setNextArrSize] = useState(arrSize);
     const [algorithm, setAlgorithm] = useState("Bubble sort");
-    const [rectRefs2, setRectRef2] = useState(null);
     const [shouldUpdate, setUpdate] = useState(false);
+    const [algorithmLink, setAlgorithmLink] = useState("https://en.wikipedia.org/wiki/Bubble_sort");
 
     var offSetTop = 30, offSetBottom = 0;
     var leftOffset = 3, rightOffset = 2;
@@ -106,12 +107,7 @@ function Sorting(props)
         return pixelsPerobj*val;
     }
 
-    function updateRefs()
-    {
-        console.log("Updated refs");
-        setRectRef2(rectRefs);
-        console.log(rectRefs2);
-    }
+   
     
     function setRectRefs(ref)
     { 
@@ -265,16 +261,25 @@ function Sorting(props)
         for(let i = 0; i < rectArray.length && !stop; i++)
         {
             let minIndex = i;
-            for(let j = i; j < rectArray.length && !stop;  j++)
+            for(let j = i+1; j < rectArray.length && !stop;  j++)
             {
                 if(animation)
                 {
                     for(let x = 0; x < rectArray.length && !stop; x++)
                     {
+                        let sorted = true; 
                         if(x < i)
+                        {
                             fill(x, "green");
-                        else
+                            console.log("Green:");
+                            console.log(rectRefs[x].attrs.fill);
+                        }
+                        else if(rectRefs[x].fill != "rgba(0,128,0,1)")
+                        {
+                            console.log(x + " is not green");
                             fill(x, "black");
+
+                        }
                     }
                     fill(i, "red");
                     fill(minIndex, "green");
@@ -297,17 +302,19 @@ function Sorting(props)
     {
         
         let swapped = true;
+        let n = 0;
         while(swapped && !stop)
         {
             swapped = false;
-            for(let i = 0; i < arrSize-1 && !stop; i++)
+            for(let i = 0; i < arrSize-n-1 && !stop; i++)
             {
                 if(animation)
                 {
                     
                     for(let x = 0; x < rectArray.length && !stop; x++)
                     {
-                        if(!swapped && x < i)
+                        
+                        if((!swapped && x < i) || x > rectArray.length-n-1)
                             fill(x, "green");
                         else
                             fill(x, "black");
@@ -325,17 +332,26 @@ function Sorting(props)
                     await swap(i, i+1, true);
                     swapped = true;
                 }
+                
             }
+            n++;
         }
         
         
     }
 
+  
     function generateArray()
     {
         setRectArray(initRectArray());
-        
-        
+    }
+
+    async function shuffleArray()
+    {
+        for(let i = 0; i < rectArray.length; i++)
+        {
+            swap(i )
+        }
     }
     
     async function generateArrayBtn(e)
@@ -420,9 +436,18 @@ function Sorting(props)
 
     function selectionChange(e)
     {
-        console.log(e.target.value);
-        console.log(algorithm);
-        setAlgorithm(e.target.value);
+        let val = e.target.value;
+        setAlgorithm(val);
+        switch(val)
+        {
+            case "Bubble sort":
+                setAlgorithmLink("https://en.wikipedia.org/wiki/Bubble_sort");
+                break;
+            case "Selection sort":
+                setAlgorithmLink("https://en.wikipedia.org/wiki/Selection_sort");
+                break;
+        }
+        
     }
 
     
@@ -467,6 +492,13 @@ function Sorting(props)
                 >
                     Generate array
                 </Button>
+                <Button
+                    variant='contained'
+                    onClick={shuffleArray}
+                    className="btn"
+                    >
+                        Shuffle
+                    </Button>
                 <Typography>
                     Interval:
                 </Typography>
@@ -611,7 +643,7 @@ function Sorting(props)
                     </Select>
 
                 </FormControl>
-                    
+                
                 <Button 
                 variant="contained"
                 className="sortBtn"
@@ -619,6 +651,23 @@ function Sorting(props)
                 >
                     Sort
                 </Button>
+                {(threads > 0) ?
+                    <Button
+                        variant="contained"
+                        className="pauseBtn"
+                        onClick={() => stop = true}
+                        >
+                            Pause
+                    </Button> : null
+                }
+                <div class="explanation">
+                    <Typography variant="h4" >
+                        <a href={algorithmLink} target="_blank" rel="noreferrer" className="algorithmTitle">
+                            {algorithm} 
+                        </a>
+                         
+                    </Typography>
+                </div>
             </div>
         </div>
 
