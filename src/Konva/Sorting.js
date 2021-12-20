@@ -1,7 +1,7 @@
 import { Checkbox, FormControlLabel, FormGroup, Slider } from '@material-ui/core';
 import React, { useEffect, useState, useRef} from 'react';
 import { Layer, Line, Rect, Stage, Text } from 'react-konva';
-import { Button, Typography } from '@mui/material';
+import { Button, StyledEngineProvider, Typography } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -38,6 +38,8 @@ var nextScale = null;  //TODO
 var threads = 0;
 var stop = false;
 
+const sortingAlgorithms = ["Bubble sort", "Selection sort", "Merge sort"];
+
 function Sorting(props)
 {
 
@@ -48,13 +50,20 @@ function Sorting(props)
     const [minmax, setMinMax] = useState([0, 1000]);
     const [sThread, setThreads] = useState(0);
     const [nextArrSize, setNextArrSize] = useState(arrSize);
-    const [algorithm, setAlgorithm] = useState("Bubble sort");
+    const [algorithmIndex, setAlgorithmIndex] = useState(0);
+    const [algorithmName,  setAlgName] = useState(sortingAlgorithms[0]);
     const [shouldUpdate, setUpdate] = useState(false);
     const [algorithmLink, setAlgorithmLink] = useState("https://en.wikipedia.org/wiki/Bubble_sort");
 
     var offSetTop = 30, offSetBottom = 0;
     var leftOffset = 3, rightOffset = 2;
     var maxHeight = props.height-offSetBottom-offSetTop;
+
+
+    const sortingFunctions = [bubbleSort, selectionSort, mergeSort];
+
+
+    
 
     
     
@@ -199,21 +208,25 @@ function Sorting(props)
         
     }
 
-    async function sortHandle(e)
+    async function sortButtonHandle(e)
     {
         setThreads(sThread+1);
         threads++;
 
 
-        switch(algorithm)
-        {
-            case "Bubble sort":
-                await bubbleSort();
-                break;
-            case "Selection sort":
-                await selectionSort();
-                break;
-        }
+        await sortingFunctions[algorithmIndex]();
+        // switch(algorithmName)  
+        // {
+        //     case "Bubble sort":
+        //         await bubbleSort();
+        //         break;
+        //     case "Selection sort":
+        //         await selectionSort();
+        //         break;
+        //     case "Merge sort":
+        //         await mergeSort();
+        //         break;
+        // }
 
 
         threads--;
@@ -252,7 +265,10 @@ function Sorting(props)
         });
     }
 
-    
+    async function mergeSort()
+    {
+
+    }
 
     async function selectionSort()
     {
@@ -267,16 +283,12 @@ function Sorting(props)
                 {
                     for(let x = 0; x < rectArray.length && !stop; x++)
                     {
-                        let sorted = true; 
                         if(x < i)
                         {
                             fill(x, "green");
-                            console.log("Green:");
-                            console.log(rectRefs[x].attrs.fill);
                         }
                         else if(rectRefs[x].fill != "rgba(0,128,0,1)")
                         {
-                            console.log(x + " is not green");
                             fill(x, "black");
 
                         }
@@ -337,7 +349,6 @@ function Sorting(props)
             n++;
         }
         
-        
     }
 
   
@@ -348,9 +359,19 @@ function Sorting(props)
 
     async function shuffleArray()
     {
-        for(let i = 0; i < rectArray.length; i++)
+        
+        for(let i = 0; i < rectArray.length && !stop; i++)
         {
-            swap(i )
+            await sleep(50);
+            try
+            {
+                await swap(i, rand(0, rectArray.length), true);
+            }
+            catch(err)
+            {
+                
+            }
+            
         }
     }
     
@@ -437,8 +458,9 @@ function Sorting(props)
     function selectionChange(e)
     {
         let val = e.target.value;
-        setAlgorithm(val);
-        switch(val)
+        setAlgorithmIndex(val);
+        setAlgName(sortingAlgorithms[val]);
+        switch(sortingAlgorithms[val])
         {
             case "Bubble sort":
                 setAlgorithmLink("https://en.wikipedia.org/wiki/Bubble_sort");
@@ -446,6 +468,12 @@ function Sorting(props)
             case "Selection sort":
                 setAlgorithmLink("https://en.wikipedia.org/wiki/Selection_sort");
                 break;
+            case "Merge sort":
+                setAlgorithmLink("https://en.wikipedia.org/wiki/Merge_sort");
+                break;
+            default:
+                setAlgorithmLink("https://en.wikipedia.org/wiki/Bubble_sort");
+                
         }
         
     }
@@ -492,13 +520,16 @@ function Sorting(props)
                 >
                     Generate array
                 </Button>
+                {(threads === 0) ? 
                 <Button
                     variant='contained'
                     onClick={shuffleArray}
                     className="btn"
                     >
                         Shuffle
-                    </Button>
+                    </Button> 
+                    :null
+                }
                 <Typography>
                     Interval:
                 </Typography>
@@ -579,11 +610,11 @@ function Sorting(props)
                         <Text
                             x={props.width/2}
                             y={30}
-                            text={"Threads: " + threads}
+                            text={"Sorting threads: " + threads}
                             />
                         
                         {
-                            rectArray.map((e, index) => (
+                            rectArray.map((e, index) => 
                                 <Rect
                                     refID={e.refID}
                                     ref={setRectRefs}
@@ -599,7 +630,7 @@ function Sorting(props)
                                 
                                 />
 
-                            ))
+                            )
                         }
                         <Line
                             x={0}
@@ -635,11 +666,17 @@ function Sorting(props)
                 <FormControl variant="standard" className="select">
                     <InputLabel id="algorithm"> Algorithm </InputLabel>
                     <Select
-                        value={algorithm}
+                        value={algorithmIndex}
+                        label={algorithmName}
                         onChange={selectionChange}
                     >
-                        <MenuItem value="Bubble sort"> Bubble sort </MenuItem>
-                        <MenuItem value= "Selection sort"> Selection sort</MenuItem>
+                        {
+                            sortingAlgorithms.map((alg, index) => 
+                                 <MenuItem value={index}> {alg} </MenuItem> 
+                            )
+                        }
+                        
+                        
                     </Select>
 
                 </FormControl>
@@ -647,7 +684,7 @@ function Sorting(props)
                 <Button 
                 variant="contained"
                 className="sortBtn"
-                onClick={sortHandle}
+                onClick={sortButtonHandle}
                 >
                     Sort
                 </Button>
@@ -663,7 +700,7 @@ function Sorting(props)
                 <div class="explanation">
                     <Typography variant="h4" >
                         <a href={algorithmLink} target="_blank" rel="noreferrer" className="algorithmTitle">
-                            {algorithm} 
+                            {algorithmName} 
                         </a>
                          
                     </Typography>
