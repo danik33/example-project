@@ -51,7 +51,6 @@ function Sorting(props)
     const [sThread, setThreads] = useState(0);
     const [nextArrSize, setNextArrSize] = useState(arrSize);
     const [algorithmIndex, setAlgorithmIndex] = useState(0);
-    const [algorithmName,  setAlgName] = useState(sortingAlgorithms[0]);
     const [shouldUpdate, setUpdate] = useState(false);
     const [algorithmLink, setAlgorithmLink] = useState("https://en.wikipedia.org/wiki/Bubble_sort");
 
@@ -76,7 +75,6 @@ function Sorting(props)
     {
         let arr = Array.from({length: arrSize}, () => rand(min, max));
         // let arr = Array.from({length: arrSize}, (e, index) => 0.5*((Math.cos(index/10 - 3))*100)+50);
-        // console.log(arr);
         let rectArr = arr.map((val, index) => ({
             key: index,
             value: val,
@@ -215,18 +213,7 @@ function Sorting(props)
 
 
         await sortingFunctions[algorithmIndex]();
-        // switch(algorithmName)  
-        // {
-        //     case "Bubble sort":
-        //         await bubbleSort();
-        //         break;
-        //     case "Selection sort":
-        //         await selectionSort();
-        //         break;
-        //     case "Merge sort":
-        //         await mergeSort();
-        //         break;
-        // }
+        
 
 
         threads--;
@@ -424,12 +411,9 @@ function Sorting(props)
 
     function arraySlider(e, value)
     {
-        console.log(value);
-        console.log("Width: " + calcWidth(null, value));
         if(calcWidth(null, value) >= 1)
             setNextArrSize(value);
         changedArrSize = true;
-        // nextArrSize = value;
     }
 
     function minValueSlider(e, value)
@@ -459,7 +443,6 @@ function Sorting(props)
     {
         let val = e.target.value;
         setAlgorithmIndex(val);
-        setAlgName(sortingAlgorithms[val]);
         switch(sortingAlgorithms[val])
         {
             case "Bubble sort":
@@ -667,7 +650,7 @@ function Sorting(props)
                     <InputLabel id="algorithm"> Algorithm </InputLabel>
                     <Select
                         value={algorithmIndex}
-                        label={algorithmName}
+                        label={sortingAlgorithms[algorithmIndex]}
                         onChange={selectionChange}
                     >
                         {
@@ -700,7 +683,7 @@ function Sorting(props)
                 <div class="explanation">
                     <Typography variant="h4" >
                         <a href={algorithmLink} target="_blank" rel="noreferrer" className="algorithmTitle">
-                            {algorithmName} 
+                            {sortingAlgorithms[algorithmIndex]} 
                         </a>
                          
                     </Typography>
