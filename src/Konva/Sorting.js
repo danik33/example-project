@@ -36,9 +36,10 @@ var changedArrSize = false;
 var nextMax = null, nextMin = null;
 var nextScale = null;  //TODO 
 var threads = 0;
+var shuffling= false;
 var stop = false;
 
-const sortingAlgorithms = ["Bubble sort", "Selection sort", "Merge sort"];
+const sortingAlgorithms = ["Bubble sort", "Selection sort", "Merge sort", "Bogo sort"];
 
 function Sorting(props)
 {
@@ -53,13 +54,15 @@ function Sorting(props)
     const [algorithmIndex, setAlgorithmIndex] = useState(0);
     const [shouldUpdate, setUpdate] = useState(false);
     const [algorithmLink, setAlgorithmLink] = useState("https://en.wikipedia.org/wiki/Bubble_sort");
+    const [active, setActive] = useState(false);
+    
 
     var offSetTop = 30, offSetBottom = 0;
     var leftOffset = 3, rightOffset = 2;
     var maxHeight = props.height-offSetBottom-offSetTop;
 
 
-    const sortingFunctions = [bubbleSort, selectionSort, mergeSort];
+    const sortingFunctions = [bubbleSort, selectionSort, mergeSort, bogoSort];
 
 
     
@@ -146,7 +149,7 @@ function Sorting(props)
 
     async function swap(index1, index2, wait)
     {
-        if(animation)
+        if(animation && wait)
         {
             swapRectsWithAnimation(index1, index2, animationDuration, true);
         }
@@ -296,6 +299,32 @@ function Sorting(props)
 
     }
 
+    function arraySorted()
+    {
+        for(let i = 0; i < rectArray.length-1; i++)
+        {
+            if(rectArray[i].value > rectArray[i+1].value)
+            {
+                return false;
+            }
+                
+        }
+        return true;
+    }
+
+    async function bogoSort()
+    {
+        console.log("bogo start: arraySorted: " + arraySorted());
+        while(!arraySorted())
+        {
+            console.log("first instance");
+            await sleep(animationDuration/2); 
+            await shuffleArray(false);
+        }
+
+
+    }
+
 
     async function bubbleSort()
     {
@@ -344,22 +373,34 @@ function Sorting(props)
         setRectArray(initRectArray());
     }
 
-    async function shuffleArray()
+    async function shuffleArray(animation)
     {
         
+        stop = false;
+        shuffling = true;
         for(let i = 0; i < rectArray.length && !stop; i++)
         {
-            await sleep(50);
             try
             {
-                await swap(i, rand(0, rectArray.length), true);
+                if(animation == true)
+                {
+                    await sleep(50);
+                    await swap(i, rand(0, rectArray.length), true);
+                }
+                else
+                {
+                    await swap(i, rand(0, rectArray.length), false);
+                }
+                    
             }
             catch(err)
             {
-                
+                console.log(err);
             }
             
         }
+        shuffling = false;
+        setActive(false);
     }
     
     async function generateArrayBtn(e)
@@ -467,10 +508,10 @@ function Sorting(props)
     
 
 
-        
-    
-    
-    return (
+
+
+
+    return (    
         <div className="container">
             <div className="sliders">
                 <Typography>
@@ -503,10 +544,13 @@ function Sorting(props)
                 >
                     Generate array
                 </Button>
-                {(threads === 0) ? 
+                {(threads === 0 && !active) ? 
                 <Button
                     variant='contained'
-                    onClick={shuffleArray}
+                    onClick={() => {
+                        setActive(true);
+                        shuffleArray(true);
+                    }}
                     className="btn"
                     >
                         Shuffle
@@ -663,19 +707,22 @@ function Sorting(props)
                     </Select>
 
                 </FormControl>
-                
+                {(!active) ? 
                 <Button 
                 variant="contained"
                 className="sortBtn"
                 onClick={sortButtonHandle}
                 >
                     Sort
-                </Button>
-                {(threads > 0) ?
+                </Button> : null
+                }
+                {(threads > 0 || active) ?
                     <Button
                         variant="contained"
                         className="pauseBtn"
-                        onClick={() => stop = true}
+                        onClick={() => {
+                            stop = true;
+                        }}
                         >
                             Pause
                     </Button> : null
@@ -685,6 +732,11 @@ function Sorting(props)
                         <a href={algorithmLink} target="_blank" rel="noreferrer" className="algorithmTitle">
                             {sortingAlgorithms[algorithmIndex]} 
                         </a>
+                         
+                    </Typography>
+                    <Typography variant="h5" class="explanationText">
+                        <p></p>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
                          
                     </Typography>
                 </div>
