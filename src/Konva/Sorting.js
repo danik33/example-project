@@ -159,17 +159,21 @@ function Sorting(props)
        
     }
 
-    function swapRects(index1, index2)
+    async function swapRects(index1, index2)
     {
+        return new Promise(res => {
+            let tempArray = [...rectArray];
+            let temp = tempArray[index1].value;
+            tempArray[index1].value = tempArray[index2].value;
+            tempArray[index2].value = temp;
 
 
-        let tempArray = [...rectArray];
-        let temp = tempArray[index1].value;
-        tempArray[index1].value = tempArray[index2].value;
-        tempArray[index2].value = temp;
+            setRectArray(tempArray);
+            res();
+            
+        });
 
-
-        setRectArray(tempArray);
+        
  
 
     }
@@ -183,7 +187,7 @@ function Sorting(props)
         }
         else 
         {
-            swapRects(index1, index2);
+            await swapRects(index1, index2);
         }
         if(wait && !stop)
         {
@@ -202,38 +206,41 @@ function Sorting(props)
 
     function swapRectsWithAnimation(index1, index2, duration, makered)
     { 
-        swapRects(index1, index2);
-
-        let tempX1 = calcX(index1); 
-        let tempX2 = calcX(index2);
-        
-        
-        let tempX = rectRefs[index1].attrs.x;
-
-        rectRefs[index1].attrs.x = rectRefs[index2].attrs.x;
-        rectRefs[index2].attrs.x = tempX;
-        let dur = (duration != null) ? duration : animationDuration;
-
-        if(makered)
-        {
-            fill(index1, "red");
-            fill(index2, "red"); 
-
-        }
-        rectRefs[index1].to({
-            x: tempX1,
-            duration: dur
-
+        swapRects(index1, index2).then(() => {
+            let tempX1 = calcX(index1); 
+            let tempX2 = calcX(index2);
             
-        });
-        rectRefs[index2].to({
-            x: tempX2,
-            duration: dur,
-            onFinish: () => {
-                fill(index1, "black");
-                fill(index2, "black"); 
+            
+            let tempX = rectRefs[index1].attrs.x;
+
+            rectRefs[index1].attrs.x = rectRefs[index2].attrs.x;
+            rectRefs[index2].attrs.x = tempX;
+            let dur = (duration != null) ? duration : animationDuration;
+
+            if(makered)
+            {
+                fill(index1, "red");
+                fill(index2, "red"); 
+
             }
+            rectRefs[index1].to({
+                x: tempX1,
+                duration: dur
+
+                
+            });
+            rectRefs[index2].to({
+                x: tempX2,
+                duration: dur,
+                onFinish: () => {
+                    fill(index1, "black");
+                    fill(index2, "black"); 
+                }
+            });
+
         });
+
+        
         
     }
 
@@ -337,8 +344,6 @@ function Sorting(props)
         {
             let sor = rectArray[i].value < rectArray[i+1].value;
             printRectArrayValues(rectArray);
-            console.log(i + ": " + rectArray[i].value + ", " + (i+1) + ":" + rectArray[i+1].value);
-            console.log("Sorted #" + i + ": " + sor);
             await sleep(1000);
             fill(i+1, "yellow");
             if(sor)
@@ -362,72 +367,48 @@ function Sorting(props)
     }
 
 
-    // async function bogoSort()
-    // {
-    //     let sorted = false;
-    //     while(!sorted && !stop)
-    //     {
-    //         for(let x = 0; x < rectArray.length; x++)
-    //         {
-    //             fill(x, "black");
-    //         }
-    //         let inPlace = true;
-    //         for(let i = 0; i < rectArray.length-1 && inPlace && !stop; i++)
-    //         {
-    //             console.log("Stop: " + stop);   
-    //             fill(i+1, "yellow");
-    //             inPlace = rectArray[i].value < rectArray[i+1].value;
-    //             if(inPlace)
-    //             {
-    //                 fill(i, "green");
-    //             }
-    //             else
-    //             {
-    //                 fill(i, "red");
-    //             }
-    //             await sleep(200);
-
-    //         }
-    //         sorted = inPlace;
-    //         if(sorted)
-    //             break;
-    //         console.log("Ordered shuffle:");
-    //         await shuffleArray(false);
-    //         console.log("After shuffle");
-    //     }
-        
-    // }
-
-
-    async function eatShit()
-    {
-        return new Promise(resolve => {
-            console.log("Start of promise");
-            setTimeout(() => {
-                console.log("End of timeout1");
-                setTimeout(() => {
-                    console.log("End of timeout2");
-                    console.log("Resolve.");
-                    resolve();
-
-                }, 1000)
-                
-            }, 1000);
-
-        });
-    }
-
     async function bogoSort()
     {
-        console.log("Start func");
-       
-        await eatShit();
+        
+        let sorted = false;
+        while(!sorted && !stop)
+        {
+            for(let x = 0; x < rectArray.length; x++)
+            {
+                fill(x, "black");
+            }
+            let inPlace = true;
+            for(let i = 0; i < rectArray.length-1 && inPlace && !stop; i++)
+            {
+                fill(i+1, "yellow");
+                inPlace = rectArray[i].value < rectArray[i+1].value;
+                if(inPlace)
+                {
+                    fill(i, "green");
+                }
+                else
+                {
+                    fill(i, "red");
+                }
+                await sleep(animationDuration*1000);
 
-        console.log("End function");
-       
-
-
+            }
+            sorted = inPlace;
+            if(sorted)
+                break;
+            await shuffleArray(false);
+        }
+        for(let x = 0; x < rectArray.length; x++)
+        {
+            fill(x, "black");
+        }
+        
     }
+
+
+   
+
+   
 
 
     async function bubbleSort()
@@ -484,21 +465,15 @@ function Sorting(props)
     async function shuffleArray(animation, customAnimationTime)
     {
         
-        stop = false;
+        
         shuffling = true;
 
-        var n = rectArray.length;
-        while(n > 0)
+        var n = rectArray.length-1;
+        while(n > 0 && !stop)
         {
             let i = rand(0, n--);
-            try
-            {
-                await swap(n, i, animation, customAnimationTime);
-            }
-            catch(a)
-            {
-                //idk why, and don't care to know.
-            }            
+            await swap(n, i, animation, customAnimationTime);
+          
         }
 
 
@@ -719,7 +694,8 @@ function Sorting(props)
                 </FormGroup>
 
                 <FormGroup
-                    >
+                className="check">
+                    
                     <FormControlLabel 
                         control=
                         {
@@ -825,6 +801,7 @@ function Sorting(props)
                             (showValues) ? 
                             rectArray.map((e, index) => 
                                 <Text
+                                    key={index}
                                     x={calcX(index)+calcWidth()/3}
                                     y={calcY(e.value)-12}
                                     text={e.value}
@@ -900,14 +877,14 @@ function Sorting(props)
                             Pause
                     </Button> : null
                 }
-                <div class="explanation">
+                <div className="explanation">
                     <Typography variant="h4" >
                         <a href={algorithmLink} target="_blank" rel="noreferrer" className="algorithmTitle">
                             {sortingAlgorithms[algorithmIndex]} 
                         </a>
                          
                     </Typography>
-                    <Typography variant="h5" class="explanationText">
+                    <Typography variant="h5" className="explanationText">
                         <p></p>
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
                          
