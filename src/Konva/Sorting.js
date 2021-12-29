@@ -23,21 +23,35 @@ function sleep(ms) {
   }
 
 
+function printRectArrayValues(arr)
+{
+    let str = "{";
+    for(let i = 0; i < arr.length; i++)
+    {
+        str += arr[i].value;
+        if(i < arr.length-1)
+            str += ", "
+    }
+    str += "}";
+    console.log(str);
+}
+
+
 var rectRefs = [];
 var shouldCreate = false, readyToCreate = false;
 
 
 var arrSize = DEFAULT_ARRAY_SIZE;
 var min = DEFAULT_MIN, max = DEFAULT_MAX;
-var scale = 1; //TODO 
 
 var changedArrSize = false; 
 
 var nextMax = null, nextMin = null;
-var nextScale = null;  //TODO 
 var threads = 0;
 var shuffling= false;
 var stop = false;
+var needToShuffle = false;
+
 
 const sortingAlgorithms = ["Bubble sort", "Selection sort", "Merge sort", "Bogo sort"];
 
@@ -55,6 +69,9 @@ function Sorting(props)
     const [shouldUpdate, setUpdate] = useState(false);
     const [algorithmLink, setAlgorithmLink] = useState("https://en.wikipedia.org/wiki/Bubble_sort");
     const [active, setActive] = useState(false);
+    const [scale, setScale] = useState(1);
+    const [genType, setGenType] = useState("Random");
+    const [showValues, setShowValues] = useState(true);
     
 
     var offSetTop = 30, offSetBottom = 0;
@@ -76,7 +93,16 @@ function Sorting(props)
 
     function initRectArray()
     {
-        let arr = Array.from({length: arrSize}, () => rand(min, max));
+        let arr;
+        if(genType == "Random")
+            arr = Array.from({length: arrSize}, () => rand(min, max));
+        else if(genType == "Fixed")
+        {
+            arr = Array.from({length: arrSize}, (val, index) => {  
+                return (max/arrSize)*(index+1);
+           });
+        }
+            
         // let arr = Array.from({length: arrSize}, (e, index) => 0.5*((Math.cos(index/10 - 3))*100)+50);
         let rectArr = arr.map((val, index) => ({
             key: index,
@@ -85,6 +111,7 @@ function Sorting(props)
             fill: "black"
 
         }));
+        // setRectArray(rectArr);
         return rectArr;
     }
 
@@ -112,7 +139,7 @@ function Sorting(props)
     
     function calculateHeight(val)
     {
-        let pixelsPerobj = maxHeight/(100*scale);
+        let pixelsPerobj = maxHeight/(100*(1/scale));
         
         return pixelsPerobj*val;
     }
@@ -147,11 +174,12 @@ function Sorting(props)
 
     }
 
-    async function swap(index1, index2, wait)
+    async function swap(index1, index2, wait, customAnimationTime)
     {
+        let aniTime = (customAnimationTime != null) ? customAnimationTime : animationDuration;
         if(animation && wait)
         {
-            swapRectsWithAnimation(index1, index2, animationDuration, true);
+            swapRectsWithAnimation(index1, index2, aniTime, true);
         }
         else 
         {
@@ -161,7 +189,7 @@ function Sorting(props)
         {
             if(animation)
             {
-                await sleep(animationDuration*1000 + 50);
+                await sleep(aniTime*1000 + 50);
             }
             else
             {
@@ -299,28 +327,104 @@ function Sorting(props)
 
     }
 
-    function arraySorted()
+    async function arraySorted()
     {
-        for(let i = 0; i < rectArray.length-1; i++)
+        for(let x = 0; x < rectArray.length; x++)
         {
-            if(rectArray[i].value > rectArray[i+1].value)
+            fill(x, "black");
+        }
+        for(let i = 0; i < rectArray.length-1 && !stop; i++)
+        {
+            let sor = rectArray[i].value < rectArray[i+1].value;
+            printRectArrayValues(rectArray);
+            console.log(i + ": " + rectArray[i].value + ", " + (i+1) + ":" + rectArray[i+1].value);
+            console.log("Sorted #" + i + ": " + sor);
+            await sleep(1000);
+            fill(i+1, "yellow");
+            if(sor)
             {
+                fill(i, "green");
+                await sleep(animationDuration*500);
+            }
+            else
+            {
+                fill(i, "red");
+                await sleep(animationDuration*2000);
                 return false;
             }
                 
         }
+        for(let x = 0; x < rectArray.length; x++)
+        {
+            fill(x, "black");
+        }
         return true;
+    }
+
+
+    // async function bogoSort()
+    // {
+    //     let sorted = false;
+    //     while(!sorted && !stop)
+    //     {
+    //         for(let x = 0; x < rectArray.length; x++)
+    //         {
+    //             fill(x, "black");
+    //         }
+    //         let inPlace = true;
+    //         for(let i = 0; i < rectArray.length-1 && inPlace && !stop; i++)
+    //         {
+    //             console.log("Stop: " + stop);   
+    //             fill(i+1, "yellow");
+    //             inPlace = rectArray[i].value < rectArray[i+1].value;
+    //             if(inPlace)
+    //             {
+    //                 fill(i, "green");
+    //             }
+    //             else
+    //             {
+    //                 fill(i, "red");
+    //             }
+    //             await sleep(200);
+
+    //         }
+    //         sorted = inPlace;
+    //         if(sorted)
+    //             break;
+    //         console.log("Ordered shuffle:");
+    //         await shuffleArray(false);
+    //         console.log("After shuffle");
+    //     }
+        
+    // }
+
+
+    async function eatShit()
+    {
+        return new Promise(resolve => {
+            console.log("Start of promise");
+            setTimeout(() => {
+                console.log("End of timeout1");
+                setTimeout(() => {
+                    console.log("End of timeout2");
+                    console.log("Resolve.");
+                    resolve();
+
+                }, 1000)
+                
+            }, 1000);
+
+        });
     }
 
     async function bogoSort()
     {
-        console.log("bogo start: arraySorted: " + arraySorted());
-        while(!arraySorted())
-        {
-            console.log("first instance");
-            await sleep(animationDuration/2); 
-            await shuffleArray(false);
-        }
+        console.log("Start func");
+       
+        await eatShit();
+
+        console.log("End function");
+       
 
 
     }
@@ -368,39 +472,40 @@ function Sorting(props)
     }
 
   
-    function generateArray()
+    async function generateArray()
     {
         setRectArray(initRectArray());
+        if(genType == "Fixed")
+        {
+            needToShuffle = true;
+        }
     }
 
-    async function shuffleArray(animation)
+    async function shuffleArray(animation, customAnimationTime)
     {
         
         stop = false;
         shuffling = true;
-        for(let i = 0; i < rectArray.length && !stop; i++)
+
+        var n = rectArray.length;
+        while(n > 0)
         {
+            let i = rand(0, n--);
             try
             {
-                if(animation == true)
-                {
-                    await sleep(50);
-                    await swap(i, rand(0, rectArray.length), true);
-                }
-                else
-                {
-                    await swap(i, rand(0, rectArray.length), false);
-                }
-                    
+                await swap(n, i, animation, customAnimationTime);
             }
-            catch(err)
+            catch(a)
             {
-                console.log(err);
-            }
-            
+                //idk why, and don't care to know.
+            }            
         }
-        shuffling = false;
+
+
+
+        shuffling = false; 
         setActive(false);
+
     }
     
     async function generateArrayBtn(e)
@@ -441,6 +546,13 @@ function Sorting(props)
                 rectRefs[i].attrs.x = calcX(i);
                 fill(i, "black");
             }
+        }
+        if(needToShuffle)
+        {
+            needToShuffle = false;
+            shuffleArray(true, 0.1);
+            
+            
         }
     });
 
@@ -502,6 +614,11 @@ function Sorting(props)
         
     }
 
+    function genChange(e)
+    {
+        setGenType(e.target.value);
+    }
+
     
     
 
@@ -536,6 +653,21 @@ function Sorting(props)
                     value={minmax}
                     onChange={minValueSlider}
                 />
+
+                <FormControl variant="standard" className="selectGen">
+                    <InputLabel id="genType"> Array type: </InputLabel>
+                    <Select
+                        value={genType}
+                        onChange={genChange}
+                        
+                    >
+                        <MenuItem value="Random"> Random </MenuItem>
+                        <MenuItem value="Fixed"> Fixed </MenuItem>
+                        
+                        
+                    </Select>
+
+                </FormControl>
                
                 <Button
                     variant="contained"
@@ -585,6 +717,24 @@ function Sorting(props)
                         
                         />
                 </FormGroup>
+
+                <FormGroup
+                    >
+                    <FormControlLabel 
+                        control=
+                        {
+                            <Checkbox
+                                defaultChecked  
+                                className="checkbox"
+                                value={showValues}
+                                onChange={(e, val) => setShowValues(val)}
+                            /> 
+                        }
+                        label="Show values"
+                        
+                        
+                        />
+                </FormGroup>
                 <Typography>
                     Animation time:
                 </Typography>
@@ -608,6 +758,19 @@ function Sorting(props)
                     max={3}
                     disabled={(animation)}
                     onChange={stepTimeSlider}
+                />
+                <Typography>
+                    Scale:
+                </Typography>
+                <Slider
+                    defaultValue={0}
+                    valueLabelDisplay="auto"
+                    min={0.1}
+                    step={0.1}
+                    max={10}
+                    value={scale}
+                    onChange={(evt, val) => setScale(val)}
+                    
                 />
                 
             </div>
@@ -656,8 +819,18 @@ function Sorting(props)
                                     shouldUpdate={shouldUpdate}
                                 
                                 />
-
                             )
+                        }
+                        {
+                            (showValues) ? 
+                            rectArray.map((e, index) => 
+                                <Text
+                                    x={calcX(index)+calcWidth()/3}
+                                    y={calcY(e.value)-12}
+                                    text={e.value}
+                                    fill="black"
+                                />
+                            ) : null
                         }
                         <Line
                             x={0}
@@ -674,13 +847,13 @@ function Sorting(props)
                             points={[0, (props.height-offSetTop)/2 + offSetTop , 10, (props.height-offSetTop)/2 + offSetTop]}
                         />
                         <Text
-                            text={"" + (100*scale)}
+                            text={"" + parseInt(100*(1/scale))}
                             x={11}
                             y={offSetTop-5}
 
                         />
                         <Text
-                            text={"" + (100*scale)/2}
+                            text={"" + parseInt(100*(1/scale))/2}
                             x={11}
                             y={(props.height)/2-5}
                         />
