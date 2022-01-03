@@ -1,12 +1,11 @@
 import { Checkbox, FormControlLabel, FormGroup, Slider } from '@material-ui/core';
-import React, { useEffect, useState, useRef} from 'react';
+import React, { useEffect, useState} from 'react';
 import { Layer, Line, Rect, Stage, Text } from 'react-konva';
-import { Button, StyledEngineProvider, Typography } from '@mui/material';
+import { Button, Typography } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import { Link } from 'react-router-dom';
 
 const DEFAULT_ARRAY_SIZE = 20;
 const DEFAULT_MIN = 1, DEFAULT_MAX = 100;
@@ -48,7 +47,6 @@ var changedArrSize = false;
 
 var nextMax = null, nextMin = null;
 var threads = 0;
-var shuffling= false;
 var stop = false;
 var needToShuffle = false;
 
@@ -66,12 +64,11 @@ function Sorting(props)
     const [sThread, setThreads] = useState(0);
     const [nextArrSize, setNextArrSize] = useState(arrSize);
     const [algorithmIndex, setAlgorithmIndex] = useState(0);
-    const [shouldUpdate, setUpdate] = useState(false);
     const [algorithmLink, setAlgorithmLink] = useState("https://en.wikipedia.org/wiki/Bubble_sort");
     const [active, setActive] = useState(false);
     const [scale, setScale] = useState(1);
     const [genType, setGenType] = useState("Random");
-    const [showValues, setShowValues] = useState(true);
+    const [showValues, setShowValues] = useState(false);
     
 
     var offSetTop = 30, offSetBottom = 0;
@@ -94,9 +91,9 @@ function Sorting(props)
     function initRectArray()
     {
         let arr;
-        if(genType == "Random")
+        if(genType === "Random")
             arr = Array.from({length: arrSize}, () => rand(min, max));
-        else if(genType == "Fixed")
+        else if(genType === "Fixed")
         {
             arr = Array.from({length: arrSize}, (val, index) => {  
                 return (max/arrSize)*(index+1);
@@ -111,7 +108,6 @@ function Sorting(props)
             fill: "black"
 
         }));
-        // setRectArray(rectArr);
         return rectArr;
     }
 
@@ -312,7 +308,7 @@ function Sorting(props)
                         {
                             fill(x, "green");
                         }
-                        else if(rectRefs[x].fill != "rgba(0,128,0,1)")
+                        else if(rectRefs[x].fill !== "rgba(0,128,0,1)")
                         {
                             fill(x, "black");
 
@@ -327,44 +323,14 @@ function Sorting(props)
                 if(rectArray[j].value < rectArray[minIndex].value)
                     minIndex = j;
             }
-            if(i != minIndex)
+            if(i !== minIndex)
                 await swap(i, minIndex, true);
             
         }
 
     }
 
-    async function arraySorted()
-    {
-        for(let x = 0; x < rectArray.length; x++)
-        {
-            fill(x, "black");
-        }
-        for(let i = 0; i < rectArray.length-1 && !stop; i++)
-        {
-            let sor = rectArray[i].value < rectArray[i+1].value;
-            printRectArrayValues(rectArray);
-            await sleep(1000);
-            fill(i+1, "yellow");
-            if(sor)
-            {
-                fill(i, "green");
-                await sleep(animationDuration*500);
-            }
-            else
-            {
-                fill(i, "red");
-                await sleep(animationDuration*2000);
-                return false;
-            }
-                
-        }
-        for(let x = 0; x < rectArray.length; x++)
-        {
-            fill(x, "black");
-        }
-        return true;
-    }
+    
 
 
     async function bogoSort()
@@ -456,7 +422,7 @@ function Sorting(props)
     async function generateArray()
     {
         setRectArray(initRectArray());
-        if(genType == "Fixed")
+        if(genType === "Fixed")
         {
             needToShuffle = true;
         }
@@ -465,8 +431,6 @@ function Sorting(props)
     async function shuffleArray(animation, customAnimationTime)
     {
         
-        
-        shuffling = true;
 
         var n = rectArray.length-1;
         while(n > 0 && !stop)
@@ -478,7 +442,6 @@ function Sorting(props)
 
 
 
-        shuffling = false; 
         setActive(false);
 
     }
@@ -524,8 +487,12 @@ function Sorting(props)
         }
         if(needToShuffle)
         {
+            stop = false;
             needToShuffle = false;
-            shuffleArray(true, 0.1);
+            setActive(true);
+            shuffleArray(true, 0.1).then(() => {
+                console.log("Then.");
+            });
             
             
         }
@@ -651,18 +618,19 @@ function Sorting(props)
                 >
                     Generate array
                 </Button>
-                {(threads === 0 && !active) ? 
-                <Button
-                    variant='contained'
-                    onClick={() => {
-                        setActive(true);
-                        shuffleArray(true);
-                    }}
-                    className="btn"
-                    >
-                        Shuffle
-                    </Button> 
-                    :null
+                {
+                    (threads === 0 && !active) &&
+
+                    <Button
+                        variant='contained'
+                        onClick={() => {
+                            setActive(true);
+                            shuffleArray(true);
+                        }}
+                        className="btn"
+                        >
+                            Shuffle
+                        </Button> 
                 }
                 <Typography>
                     Interval:
@@ -700,7 +668,6 @@ function Sorting(props)
                         control=
                         {
                             <Checkbox
-                                defaultChecked  
                                 className="checkbox"
                                 value={showValues}
                                 onChange={(e, val) => setShowValues(val)}
@@ -792,13 +759,13 @@ function Sorting(props)
                                     width={calcWidth()}
                                     height={calculateHeight(e.value)}
                                     fill={e.fill}
-                                    shouldUpdate={shouldUpdate}
                                 
                                 />
                             )
                         }
                         {
-                            (showValues) ? 
+                            (showValues) &&
+
                             rectArray.map((e, index) => 
                                 <Text
                                     key={index}
@@ -807,7 +774,7 @@ function Sorting(props)
                                     text={e.value}
                                     fill="black"
                                 />
-                            ) : null
+                            ) 
                         }
                         <Line
                             x={0}
@@ -857,16 +824,20 @@ function Sorting(props)
                     </Select>
 
                 </FormControl>
-                {(!active) ? 
-                <Button 
-                variant="contained"
-                className="sortBtn"
-                onClick={sortButtonHandle}
-                >
-                    Sort
-                </Button> : null
+                {
+                    (!active) &&
+
+                    <Button 
+                    variant="contained"
+                    className="sortBtn"
+                    onClick={sortButtonHandle}
+                    >
+                        Sort
+                    </Button> 
                 }
-                {(threads > 0 || active) ?
+                {
+                    (threads > 0 || active) &&
+
                     <Button
                         variant="contained"
                         className="pauseBtn"
@@ -875,15 +846,16 @@ function Sorting(props)
                         }}
                         >
                             Pause
-                    </Button> : null
+                    </Button> 
                 }
                 <div className="explanation">
+
                     <Typography variant="h4" >
                         <a href={algorithmLink} target="_blank" rel="noreferrer" className="algorithmTitle">
                             {sortingAlgorithms[algorithmIndex]} 
                         </a>
-                         
                     </Typography>
+
                     <Typography variant="h5" className="explanationText">
                         <p></p>
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
